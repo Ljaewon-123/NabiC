@@ -3,12 +3,12 @@
     <div class="col">
       <div class="row q-mt-sm">Quick Access</div>
       <div class="row gap-12">
-        <div
-          v-for="(quick, index) in quickItems"
-          :key="index"
-          class="col-5 col-sm-2 full-height"
-        >
-          <q-card class="quick-access">
+        <div class="col full-height flex">
+          <q-card
+            v-for="(quick, index) in quickItems"
+            :key="index"
+            class="quick-access min-w-100"
+          >
             <q-card-section class="text-center">
               <q-icon size="lg" color="red" :name="quick.icon"></q-icon>
               <div class="text-subtitle2">{{ quick.title }}</div>
@@ -24,13 +24,89 @@
       <div class="row">Recent Files</div>
       <div class="row"></div>
     </div>
-    <div class="col-2 col-sm-*">
+    <div class="col-2">
       <div class="row">1</div>
       <div class="row">2</div>
       <div class="row">3</div>
       <div class="row">4</div>
     </div>
   </div>
+  <!-- <div class="flex gap-12">
+    <div class="flex gap-12">
+      <q-card class="quick-access min-w-100">
+        <q-card-section class="text-center">
+          <q-icon size="lg" color="red" :name="'image'"></q-icon>
+          <div class="text-subtitle2">{{ 'asd' }}</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          {{ 'aewg' }}
+          asdgahg
+        </q-card-section>
+      </q-card>
+      <q-card class="quick-access min-w-100">
+        <q-card-section class="text-center">
+          <q-icon size="lg" color="red" :name="'image'"></q-icon>
+          <div class="text-subtitle2">{{ 'asd' }}</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          {{ 'aewg' }}
+          asdgahg
+        </q-card-section>
+      </q-card>
+      <q-card class="quick-access min-w-100">
+        <q-card-section class="text-center">
+          <q-icon size="lg" color="red" :name="'image'"></q-icon>
+          <div class="text-subtitle2">{{ 'asd' }}</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          {{ 'aewg' }}
+          asdgahg
+        </q-card-section>
+      </q-card>
+      <q-card class="quick-access min-w-100">
+        <q-card-section class="text-center">
+          <q-icon size="lg" color="red" :name="'image'"></q-icon>
+          <div class="text-subtitle2">{{ 'asd' }}</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          {{ 'aewg' }}
+          asdgahg
+        </q-card-section>
+      </q-card>
+      <q-card class="quick-access min-w-100">
+        <q-card-section class="text-center">
+          <q-icon size="lg" color="red" :name="'image'"></q-icon>
+          <div class="text-subtitle2">{{ 'asd' }}</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          {{ 'aewg' }}
+          asdgahg
+        </q-card-section>
+      </q-card>
+      <q-card class="quick-access min-w-100">
+        <q-card-section class="text-center">
+          <q-icon size="lg" color="red" :name="'image'"></q-icon>
+          <div class="text-subtitle2">{{ 'asd' }}</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          {{ 'aewg' }}
+          asdgahg
+        </q-card-section>
+      </q-card>
+    </div>
+    <div>
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+      <div>4</div>
+    </div>
+  </div> -->
 </template>
 
 <script setup lang="ts">
@@ -97,5 +173,8 @@ const quickItems = ref([
 }
 .gap-12 {
   gap: 12px;
+}
+.min-w-100 {
+  min-width: 110px;
 }
 </style>
