@@ -35,6 +35,7 @@
 
   --section-gap: 160px;
 }
+[color-scheme='light']{}
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -49,6 +50,7 @@
     --color-text: var(--vt-c-text-dark-2);
   }
 }
+[color-scheme='dark']{}
 
 *,
 *::before,
