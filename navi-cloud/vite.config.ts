@@ -9,6 +9,10 @@ import Layouts from 'vite-plugin-vue-layouts';
 import electron from 'vite-plugin-electron/simple'
 import path from 'node:path';
 
+import { VitePWA } from 'vite-plugin-pwa'
+
+// npm i vite-plugin-pwa
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -45,7 +49,38 @@ export default defineConfig({
         })
         return command === 'build' 
       }
-    }
+    },
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'Nuriflex',
+        short_name: 'monit',
+        description: 'Nuriflex Monit',
+        icons: [
+          {
+            src: "assets/images/logos/Logo_64.png",
+            sizes: "64x64",
+            type:"image/png",
+            
+          },
+          {
+            src: "assets/images/logos/Logo_360.png",
+            sizes: "360x360",
+            type:"image/png",
+            
+          },
+          {
+            src: "assets/images/logos/Logo_512.png",
+            sizes: "512x512",
+            type: "image/png",
+            
+          },
+        ]
+      },
+      devOptions: {
+        enabled: true
+      },
+    })
   ],
   resolve: {
     alias: {
