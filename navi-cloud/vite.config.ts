@@ -9,6 +9,8 @@ import Layouts from 'vite-plugin-vue-layouts';
 import electron from 'vite-plugin-electron/simple'
 import path from 'node:path';
 
+import { VitePWA } from 'vite-plugin-pwa'
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -45,7 +47,44 @@ export default defineConfig({
         })
         return command === 'build' 
       }
-    }
+    },
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'Nabi-cloud',
+        short_name: 'Cloud',
+        description: 'Nabi Cloud',
+        icons: [
+          {
+            src: "assets/images/logos/Logo_16.png",
+            sizes: "16x16",
+            type:"image/png",
+            
+          },
+          {
+            src: "assets/images/logos/Logo_32.png",
+            sizes: "32x32",
+            type:"image/png",
+            
+          },
+          {
+            src: "assets/images/logos/Logo_70.png",
+            sizes: "70x70",
+            type:"image/png",
+            
+          },
+          {
+            src: "assets/images/logos/Logo_96.png",
+            sizes: "96x96",
+            type: "image/png",
+            
+          },
+        ]
+      },
+      devOptions: {
+        enabled: true
+      },
+    })
   ],
   resolve: {
     alias: {
