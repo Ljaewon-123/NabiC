@@ -10,7 +10,10 @@ lerna-debug.log*
 node_modules
 .DS_Store
 dist
+dev-dist
+dist-electron
 dist-ssr
+dist-*
 coverage
 *.local
 

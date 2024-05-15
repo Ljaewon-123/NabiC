@@ -15,14 +15,14 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [
     vue(),
-    pages({
-      // dirs: 'src/views'
-    }),
-    Layouts({
-      layoutsDirs: 'src/mylayouts',
-      pagesDirs: 'src/pages',
-      defaultLayout: 'myDefault'
-    }),
+    // pages({
+    //   // dirs: 'src/views'
+    // }),
+    // Layouts({
+    //   layoutsDirs: 'src/mylayouts',
+    //   pagesDirs: 'src/pages',
+    //   defaultLayout: 'myDefault'
+    // }),
     {
       name: 'electron',
       apply(config, { command }) {
@@ -54,6 +54,7 @@ export default defineConfig({
         name: 'Nabi-cloud',
         short_name: 'Cloud',
         description: 'Nabi Cloud',
+        theme_color: '#ffffff',
         icons: [
           {
             src: "assets/images/logos/Logo_16.png",

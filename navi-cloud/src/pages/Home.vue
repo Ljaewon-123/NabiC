@@ -69,19 +69,20 @@
         height="150"
         @mouseover="mouseover = true"
         @mouseleave="mouseover = false"
-        style="cursor: pointer; background-color: #90CAF9"
+        style="cursor: pointer; background-color: #E3F2FD"
       >
         <template v-if="mouseover" #actions>
 
           <v-checkbox
+          v-model="fileCheck"
+            color="blue-darken-4"
             hide-details
-            v-model="allCheck"
           ></v-checkbox>  
 
           <v-spacer></v-spacer>
 
           <v-btn
-          
+            color="blue-darken-4"
             v-model="star"
             @click="star = !star"
             :icon="star ? 'mdi-star' : 'mdi-star-outline' "
@@ -101,6 +102,8 @@ import { ref } from 'vue'
 const allCheck = ref(false)
 const toggleBtn = ref()
 
+const fileCheck = ref(false)
+
 const mouseover = ref(false)
 const star = ref(false)
 
@@ -117,5 +120,12 @@ const star = ref(false)
 <style>
 .files .v-card-actions{
   padding: 0px;
+}
+
+.files img{
+  width:50%;
+  height: 50%;
+  top:25%;
+  left:25%;
 }
 </style>
