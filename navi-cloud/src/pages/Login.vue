@@ -1,6 +1,5 @@
 <template>
-<v-container fluid class="h-100">
-  <div class="background"></div>
+<v-main class="d-flex justify-center align-center">
   <v-col cols="10" md="4" class="mx-auto">
     <v-card class="pa-4">
       <div class="text-center">
@@ -41,7 +40,7 @@
       </v-form>
     </v-card>
   </v-col>
-</v-container>
+</v-main>
 
 <v-snackbar top color="success" v-model="snackbar">
   Login success
@@ -73,8 +72,3 @@ const submitHandler = async() => {
 
 </script>
 
-<style scoped>
-.background{
-  height: 20%;
-}
-</style>
