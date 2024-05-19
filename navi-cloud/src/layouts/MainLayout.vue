@@ -32,16 +32,17 @@
             :prepend-icon="grandchild.icon"
             :title="grandchild.title"
             :value="grandchild.title"
-            :active-color="'blue-darken-3'"
+            :color="'blue-darken-3'"
           ></v-list-item>
 
         </v-list-group>
 
         <v-list-item
           v-else
+          :to="child.url"
           :title="child.title"
           :value="child.title"
-          :active-color="'blue-darken-3'"
+          :color="'blue-darken-3'"
         ></v-list-item>
         
       </template>
@@ -78,13 +79,19 @@
 <v-main
   class="d-flex align-center justify-center"
 >
-  <!-- style="min-height: 300px" -->
+<v-app-bar 
+class="w-100 file-topbar"
+height="140" elevation="0" >
+  <file-topbar></file-topbar>
+</v-app-bar>
+  
   <RouterView/>
 </v-main>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import FileTopbar from '@/components/FileTopbar.vue';
 
 const drawer = ref()
 const spareCapacity = ref(30)
@@ -92,11 +99,11 @@ const spareCapacity = ref(30)
 const links = [
   { type: 'mngt' ,
     children: [
-      { title: 'All files', url: ''},
+      { title: 'All Files', url: { name: 'Home' }},
       { title: 'Recent', url: '', 
       children:[
-          { title: 'Recent Upload', url: '', icon: '' },
-          { title: 'Recent Open', url: '', icon: '' }
+          { title: 'Recent Upload', url: '', icon: 'mdi-folder-upload' },
+          { title: 'Recent Open', url: '', icon: 'mdi-folder-open' }
         ] 
       },
       { title:"Favorites" , url: ''}
@@ -120,3 +127,4 @@ const links = [
 }
 
 </style>
+

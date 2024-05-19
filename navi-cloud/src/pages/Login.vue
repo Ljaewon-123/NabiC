@@ -33,7 +33,7 @@
             <span class="white--text px-8">Login</span>
           </v-btn>
 
-          <v-btn :loading="loading" :to="{ name: 'Signup' }" variant="outlined" type="submit" color="indigo">
+          <v-btn :to="{ name: 'Signup' }" variant="outlined" type="submit" color="indigo">
             <span class="white--text px-8">Signup</span>
           </v-btn>
         </v-card-actions>
@@ -42,19 +42,25 @@
   </v-col>
 </v-main>
 
-<v-snackbar top color="success" v-model="snackbar">
-  Login success
+<v-snackbar location="top" :color="snack.snackColor.value" v-model="snack.snackbar.value">
+  {{ snack.snackMess.value }}
 </v-snackbar>
 
 </template>
 
 <script setup lang="ts">
+import { naviapi } from '@/boots/AxiosInstance';
+import { VSnack } from '@/utils';
 import { ref } from 'vue'
+import { useRouter } from 'vue-router';
+
+const snack = new VSnack()
+const router = useRouter()
 
 const loading = ref(false)
-const snackbar = ref(false)
 const passwordShow = ref(false)
-const email = ref('')
+const email = ref('test@test.com')
+const password = ref('123123')
 const emailRules = [
   (v: string) => !!v || 'E-mail is required',
   (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
@@ -63,11 +69,33 @@ const passwordRules = [
   (v:string) => !!v || 'Password is required',
   (v:string) => (v && v.length >= 6) || 'Password must be 6  characters or more!',
 ]
-const password = ref('')
 
 
 const submitHandler = async() => {
 
+  loading.value = true
+  let sign
+  try{
+    sign = await naviapi.post('auth/signin', {
+      email: email.value,
+      password: password.value,
+    })
+
+    localStorage.setItem('vtoken', sign.data)
+  }
+  catch{
+    snack.showSnack('Fail Signup', 'error')
+    return
+  }
+  finally{
+    loading.value = false
+  }
+
+  snack.showSnack('Login success', 'success')
+
+  console.log(sign, 'login')
+
+  setTimeout(() => router.push({ name: 'Home' }), 1000)
 }
 
 </script>

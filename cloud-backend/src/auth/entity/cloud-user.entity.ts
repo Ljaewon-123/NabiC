@@ -14,6 +14,12 @@ export class CloudUser {
   @Column({ nullable: true })
   hashedRt: string;
 
+  @Column({ type: 'varchar', length: 10, default: 'customer' })
+  roles: string[]
+
+  @Column('int', { default: 20 })
+  hardSpace: number
+
   @CreateDateColumn()
   createdAt: Date
 

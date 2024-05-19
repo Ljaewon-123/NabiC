@@ -31,7 +31,7 @@ export class AuthService {
     return tokens
   }
 
-  async signin(dto: AuthDto): Promise<Tokens> {
+  async signin(dto: AuthDto): Promise<string> {
     const user = await this.userRepository.findOne({
       where:{
         email: dto.email
@@ -41,14 +41,14 @@ export class AuthService {
     if(!user) throw new ForbiddenException("Access Denied")
 
     // 유저한테 받은값하고 db값하고 비교해야함 == 원본 비번을 저장할 필요없음
-    // const passwordMatches = bcrypt.compare(user.password, user.passwordHash)
+    const passwordMatches = bcrypt.compare(dto.password, user.passwordHash)
 
-    // if(!passwordMatches) throw new ForbiddenException("Access Denied")
+    if(!passwordMatches) throw new ForbiddenException("Access Denied")
 
     const tokens = await this.getToken(user.id, user.email);
     // await this.updateRtHash(user.id, tokens.refresh_token);
 
-    return tokens;
+    return tokens.access_token;
   }
 
   async logout(userId: number) {
@@ -93,7 +93,8 @@ export class AuthService {
         
         this.jwtService.signAsync({
           sub: userId,
-          email
+          email,
+          role: 'ROLES'
         },{
           secret: 'at-secret',
           expiresIn: 60 * 15

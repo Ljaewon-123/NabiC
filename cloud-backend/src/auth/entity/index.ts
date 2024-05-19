@@ -1,1 +1,1 @@
-export * from './cloud-user-entity'
+export * from './cloud-user.entity'

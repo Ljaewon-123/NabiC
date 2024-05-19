@@ -32,9 +32,18 @@ const router = createRouter({
     {
       path: '/main',
       name: 'Main',
+      redirect: { name: 'Home' },
       component: () => import('@/layouts/MainLayout.vue'),
+      beforeEnter: () => {
+        const token = localStorage.getItem('vtoken')
+        if(!token) return { name: 'Login' }
+      },
       children: [
-        { path: '/main/home', component: () => import('@/pages/Home.vue') }
+        { 
+          path: '/main/home', 
+          name: 'Home',
+          component: () => import('@/pages/Home.vue') 
+        }
       ],
     },
   ]

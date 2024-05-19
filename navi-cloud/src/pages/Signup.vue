@@ -5,7 +5,7 @@
       <div class="text-center">
         <h2 class="indigo--text">Sign up</h2>
       </div>
-      <v-form @submit.prevent="submitHandler" ref="form">
+      <v-form @submit.prevent="submitHandler" validate-on="submit lazy" ref="form">
         <v-card-text>
           <v-text-field
             v-model="email"
@@ -38,17 +38,23 @@
   </v-col>
 </v-main>
 
-<v-snackbar top color="success" v-model="snackbar">
-  Signup success
+<v-snackbar location="top" :color="snack.snackColor.value" v-model="snack.snackbar.value">
+  {{ snack.snackMess.value }}
 </v-snackbar>
 
 </template>
 
 <script setup lang="ts">
+import { naviapi } from '@/boots/AxiosInstance';
+import { VSnack } from '@/utils/VSnack';
 import { ref } from 'vue'
+import { useRouter } from 'vue-router';
+
+const snack = new VSnack()
+
+const router = useRouter()
 
 const loading = ref(false)
-const snackbar = ref(false)
 const passwordShow = ref(false)
 const email = ref('')
 const emailRules = [
@@ -62,8 +68,28 @@ const passwordRules = [
 const password = ref('')
 
 
+
 const submitHandler = async() => {
 
+  loading.value = true
+  
+  try{
+    await naviapi.post('auth/signup', {
+      email: email.value,
+      password: password.value,
+    })
+  }
+  catch{
+    snack.showSnack('Fail Signup', 'error')
+    return
+  }
+  finally{
+    loading.value = false
+  }
+
+  snack.showSnack('Success Signup', 'success')
+
+  setTimeout(() => router.push({ name: 'Login' }), 1000)
 }
 
 </script>
