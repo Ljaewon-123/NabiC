@@ -1,4 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, DeleteDateColumn } from 'typeorm';
+import { Files } from 'src/upload/entity/files.entity';
+import { Entity, Column,
+  PrimaryGeneratedColumn, CreateDateColumn, DeleteDateColumn ,
+  OneToMany
+} from 'typeorm';
 
 @Entity()
 export class CloudUser {
@@ -28,4 +32,8 @@ export class CloudUser {
 
   @DeleteDateColumn()
   deletedAt: Date
+
+  // 생략해도 되는걸로 아는데 
+  @OneToMany(() => Files, files => files.userId)
+  files: Files[]
 }

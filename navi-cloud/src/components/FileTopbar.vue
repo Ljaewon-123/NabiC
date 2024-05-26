@@ -92,6 +92,10 @@ import { ref, type Ref } from 'vue';
 import { useFileDialog } from '@vueuse/core'
 import { naviapi, upload } from '@/boots/AxiosInstance';
 
+interface Files extends File {
+  lastModifiedDate: Date
+}
+
 const { 
   files: folder, 
   open: folderOpen, 
@@ -108,7 +112,13 @@ onChange(async (files: FileList | null) => {
   const formData = new FormData();
 
   Object.keys(files).forEach( (fileIndex: string) => {
-    formData.append('files', files[Number(fileIndex)], files[Number(fileIndex)].name );
+
+    const file = files[Number(fileIndex)] as Files
+    
+    formData.append('files', file, file.name );
+
+    formData.append('lastModified',  String(file.lastModified) )
+    formData.append('lastModifiedDate', String(file.lastModifiedDate) )
   })
 
   console.log(files, typeof files)
