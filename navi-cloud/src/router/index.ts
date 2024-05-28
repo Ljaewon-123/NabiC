@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/auth'
 import { createRouter, createWebHistory } from 'vue-router'
 // import { setupLayouts } from 'virtual:generated-layouts';
 // import generatedRoutes from 'virtual:generated-pages';
@@ -35,7 +36,9 @@ const router = createRouter({
       redirect: { name: 'Home' },
       component: () => import('@/layouts/MainLayout.vue'),
       beforeEnter: () => {
-        const token = localStorage.getItem('vtoken')
+        const { getAccessToken } = useAuthStore()
+
+        const token = getAccessToken()
         if(!token) return { name: 'Login' }
       },
       children: [

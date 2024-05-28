@@ -50,9 +50,14 @@
 
 <script setup lang="ts">
 import { naviapi } from '@/boots/AxiosInstance';
+import { useAuthStore } from '@/stores/auth';
 import { VSnack } from '@/utils';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
+
+const { setAccessToken } = useAuthStore()
+
+localStorage.clear()
 
 const snack = new VSnack()
 const router = useRouter()
@@ -81,7 +86,7 @@ const submitHandler = async() => {
       password: password.value,
     })
 
-    localStorage.setItem('vtoken', sign.data)
+    setAccessToken(sign.data)
   }
   catch{
     snack.showSnack('Fail Signup', 'error')

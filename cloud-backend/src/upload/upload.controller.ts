@@ -18,8 +18,6 @@ export class UploadController {
     private readonly uploadService: UploadService
   ){}
 
-  
-  
   // 여러개가 들어오면 반응안함 
   // 이거 없어도 될거같긴한데
   @Post('file')
@@ -85,32 +83,22 @@ export class UploadController {
     const newFileArray = pathFiles.map( (file:Express.Multer.File, index: number ) => {
       const nameArray = file.originalname.split('/')
       const fileName = nameArray.splice(-1, 1) // 마지막이 파일이름 
-      const fileEntity = new Files();
-      fileEntity.userId = userId
-      fileEntity.lastModified = isArray(lastModified) ? lastModified[index] : lastModified,
-      fileEntity.lastModifiedDate = isArray(lastModifiedDate) ? lastModifiedDate[index] : lastModifiedDate,
-      fileEntity.directory = nameArray
-      fileEntity.fileName = fileName[0]
-      fileEntity.file = file.buffer
-      fileEntity.fileType = file.mimetype
-      fileEntity.size = file.size
 
-      return fileEntity
-      // return {
-      //   userId: userId,
-      //   lastModified: isArray(lastModified) ? lastModified[index] : lastModified,
-      //   lastModifiedDate: isArray(lastModifiedDate) ? lastModifiedDate[index] : lastModifiedDate,
-      //   directory: nameArray,
-      //   fileName : fileName[0],
-      //   file : file.buffer,
-      //   fileType : file.mimetype,
-      //   size: file.size
-      // }
+      return this.uploadService.createRepoFiles({
+        userId: userId,
+        lastModified: isArray(lastModified) ? lastModified[index] : lastModified,
+        lastModifiedDate: isArray(lastModifiedDate) ? lastModifiedDate[index] : lastModifiedDate,
+        directory: nameArray,
+        fileName : fileName[0],
+        file : file.buffer,
+        fileType : file.mimetype,
+        size: file.size
+      })
     })
 
     await this.uploadService.createPathFiles(newFileArray)
     
-    // console.log(pathFiles)
+    console.log(pathFiles)
   }
 
 

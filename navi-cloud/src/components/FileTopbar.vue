@@ -31,17 +31,17 @@
               </v-btn>
             </template>
             <v-list >
-              <v-list-item :value="1">
+              <v-list-item >
                 <v-list-item-title @click="open">File Upload</v-list-item-title>
               </v-list-item>
 
-              <v-list-item :value="2">
+              <v-list-item >
                 <v-list-item-title @click="folderOpen" >Folder Upload</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
 
-          <v-btn class="text-none" variant="tonal">
+          <v-btn @click="newFolder = true" class="text-none" variant="tonal">
             New Folder
           </v-btn>
 
@@ -84,6 +84,30 @@
 
   <v-divider></v-divider>
 </v-container>
+
+<v-dialog
+  v-model="newFolder"
+  max-width="400"
+>
+
+  <v-card
+    prepend-icon="mdi-folder-plus-outline"
+    text="Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running."
+    title="Use Google's location service?"
+  >
+    <template v-slot:actions>
+      <v-spacer></v-spacer>
+
+      <v-btn @click="newFolder = false">
+        Disagree
+      </v-btn>
+
+      <v-btn @click="newFolder = false">
+        Agree
+      </v-btn>
+    </template>
+  </v-card>
+</v-dialog>
 
 </template>
 
@@ -147,6 +171,7 @@ folderOnChange( async( folders: FileList | null ) => {
 
 const allCheck = ref(false)
 const toggleBtn = ref()
+const newFolder = ref(false)
 
 </script>
 
