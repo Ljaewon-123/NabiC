@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const API_URL = import.meta.env.VITE_APP_URL
 
@@ -25,6 +25,21 @@ function create(baseURL: string, options?: any) {
       
       return response
     },
+    async (error) => {
+
+      if(error.code == 'ERR_CANCELED') return AxiosError
+
+      const { config, response: { status }} = error
+
+      if( status == 401 ){
+        const response = await instance.post('auth/refresh')
+
+        console.log(response.data)
+      }
+
+
+      return error
+    }, { synchronous: true }
   )
   
   return instance
@@ -51,6 +66,22 @@ function createUpload(baseURL: string, options?: any) {
       
       return response
     },
+
+    async (error) => {
+
+      if(error.code == 'ERR_CANCELED') return AxiosError
+
+      const { config, response: { status }} = error
+
+      if( status == 401 ){
+        const response = await instance.post('auth/refresh')
+
+        console.log(response.data)
+      }
+
+
+      return error
+    }, { synchronous: true }
   )
   
   return instance
