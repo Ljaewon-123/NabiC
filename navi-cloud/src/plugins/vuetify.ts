@@ -44,7 +44,7 @@ export default createVuetify({
 
   },
   icons: {
-    defaultSet: 'mdi', // 'mdi' || 'mdiSvg' || 'md' || 'fa' || 'fa4' || 'faSvg'
+    defaultSet: 'mdi',
     // aliases,
     sets: {
       md,
