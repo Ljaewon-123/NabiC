@@ -33,7 +33,7 @@ const router = createRouter({
     {
       path: '/main',
       name: 'Main',
-      redirect: { name: 'Home' },
+      redirect: { name: 'Root' },
       component: () => import('@/layouts/MainLayout.vue'),
       beforeEnter: () => {
         const { getAccessToken } = useAuthStore()
@@ -43,10 +43,15 @@ const router = createRouter({
       },
       children: [
         { 
-          path: '/main/home', 
-          name: 'Home',
-          component: () => import('@/pages/Home.vue') 
-        }
+          path: '/main/root', 
+          name: 'Root',
+          component: () => import('@/pages/Root.vue') 
+        },
+        { 
+          path: '/main/path:directory', 
+          name: 'Path',
+          component: () => import('@/pages/Path.vue') 
+        },
       ],
     },
   ]

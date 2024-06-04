@@ -99,7 +99,7 @@ const spareCapacity = ref(30)
 const links = [
   { type: 'mngt' ,
     children: [
-      { title: 'All Files', url: { name: 'Home' }},
+      { title: 'All Files', url: { name: 'Root' }},
       { title: 'Recent', url: '', 
       children:[
           { title: 'Recent Upload', url: '', icon: 'mdi-folder-upload' },

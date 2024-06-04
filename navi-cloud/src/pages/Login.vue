@@ -100,7 +100,7 @@ const submitHandler = async() => {
 
   console.log(sign, 'login')
 
-  setTimeout(() => router.push({ name: 'Home' }), 1000)
+  setTimeout(() => router.push({ name: 'Root' }), 1000)
 }
 
 </script>

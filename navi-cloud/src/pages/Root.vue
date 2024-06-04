@@ -33,7 +33,6 @@
         </template>
         
       </v-card>
-
     </v-col>
   </v-row>
 </v-container>
@@ -41,12 +40,18 @@
 <!-- v-fade-transition -->
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 
 const fileCheck = ref(false)
 
 const mouseover = ref(false)
 const star = ref(false)
 
+// const test = () => {
+//   router.push({ name: 'Path',  params: { directory: 'eduardo' }})
+// }
 
 </script>
 

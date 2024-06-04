@@ -92,18 +92,26 @@
 
   <v-card
     prepend-icon="mdi-folder-plus-outline"
-    text="Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running."
-    title="Use Google's location service?"
+    title="Create Folder?"
   >
-    <template v-slot:actions>
+    <template #text>
+      <v-text-field
+        v-model="newFolderName"
+        hint="Enter your new folder name"
+        placeholder="Foler Name"
+        persistent-hint
+        density="comfortable"
+      ></v-text-field>
+    </template>
+    <template #actions>
       <v-spacer></v-spacer>
 
-      <v-btn @click="newFolder = false">
-        Disagree
+      <v-btn color="primary" variant="tonal" @click="newFolder = false">
+        Save
       </v-btn>
 
-      <v-btn @click="newFolder = false">
-        Agree
+      <v-btn color="error" variant="outlined" @click="newFolder = false">
+        Cancel
       </v-btn>
     </template>
   </v-card>
@@ -169,9 +177,10 @@ folderOnChange( async( folders: FileList | null ) => {
 })
 
 
-const allCheck = ref(false)
+const allCheck = ref<boolean>(false)
 const toggleBtn = ref()
-const newFolder = ref(false)
+const newFolder = ref<boolean>(false)
+const newFolderName = ref<string>()
 
 </script>
 
