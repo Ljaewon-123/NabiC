@@ -34,6 +34,7 @@ export class Folders {
     onDelete: 'CASCADE',
   })
   userId: number
+
 }
 
 // git book

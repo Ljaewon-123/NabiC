@@ -1,4 +1,5 @@
 import { Files } from 'src/upload/entity/files.entity';
+import { Folders } from 'src/upload/entity/folders.entity';
 import { Entity, Column,
   PrimaryGeneratedColumn, CreateDateColumn, DeleteDateColumn ,
   OneToMany
@@ -36,4 +37,7 @@ export class CloudUser {
   // 생략해도 되는걸로 아는데 
   @OneToMany(() => Files, files => files.userId)
   files: Files[]
+
+  @OneToMany(() => Folders, folders => folders.userId)
+  folders: Folders[]
 }

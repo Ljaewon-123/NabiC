@@ -2,7 +2,7 @@ export interface ModifiedFile  {
   id?: number
   userId : number
 
-  directory?: string[],
+  directory?: string,
 
   fileName : string
   file : Buffer

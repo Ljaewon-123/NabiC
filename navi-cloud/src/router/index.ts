@@ -23,18 +23,18 @@ const router = createRouter({
     {
       path: '/login',
       name: 'Login',
-      component: () => import('@/pages/Login.vue'),
+      component: () => import('@/views/Login.vue'),
     },
     {
       path: '/signup',
       name: 'Signup',
-      component: () => import('@/pages/Signup.vue'),
+      component: () => import('@/views/Signup.vue'),
     },
     {
       path: '/main',
       name: 'Main',
       redirect: { name: 'Root' },
-      component: () => import('@/layouts/MainLayout.vue'),
+      component: () => import('@/views/MainLayout.vue'),
       beforeEnter: () => {
         const { getAccessToken } = useAuthStore()
 
@@ -45,19 +45,19 @@ const router = createRouter({
         { 
           path: '/main/root', 
           name: 'Root',
-          component: () => import('@/pages/Root.vue') 
+          component: () => import('@/views/files/RootView.vue') 
         },
         { 
           path: '/main/path:directory', 
           name: 'Path',
-          component: () => import('@/pages/Path.vue') 
+          component: () => import('@/views/files/FilderContents.vue') 
         },
       ],
     },
     {
       path: '/:path(.*)*',
       name: 'NotFound',
-      component: () => import('@/pages/NotFoundView.vue')
+      component: () => import('@/views/NotFoundView.vue')
     },
   ]
 })

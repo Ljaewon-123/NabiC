@@ -31,12 +31,12 @@
               </v-btn>
             </template>
             <v-list >
-              <v-list-item >
-                <v-list-item-title @click="open">File Upload</v-list-item-title>
+              <v-list-item @click="open">
+                <v-list-item-title >File Upload</v-list-item-title>
               </v-list-item>
 
-              <v-list-item >
-                <v-list-item-title @click="folderOpen" >Folder Upload</v-list-item-title>
+              <v-list-item @click="folderOpen">
+                <v-list-item-title  >Folder Upload</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -181,6 +181,8 @@ const allCheck = ref<boolean>(false)
 const toggleBtn = ref()
 const newFolder = ref<boolean>(false)
 const newFolderName = ref<string>()
+
+
 
 </script>
 

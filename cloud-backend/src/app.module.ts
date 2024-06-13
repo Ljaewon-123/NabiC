@@ -7,6 +7,7 @@ import { AtGuard } from './guards';
 import { UploadModule } from './upload/upload.module';
 import { ConfigService } from '@nestjs/config';
 import { AtStrategy, RtStrategy } from './auth/strategies';
+import { UserDataModule } from './user-data/user-data.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AtStrategy, RtStrategy } from './auth/strategies';
     }),
     AuthModule,
     UploadModule,
+    UserDataModule,
   ],
   // controllers: [],
   providers: [

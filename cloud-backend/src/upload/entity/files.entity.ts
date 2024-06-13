@@ -28,8 +28,8 @@ export class Files {
   @Column()
   fileType: string
 
-  @Column({ type: 'text', array: true, nullable: true })
-  directory: string[]
+  @Column({ type: 'text', nullable: true })
+  directory: string
 
   @Column()
   size: number

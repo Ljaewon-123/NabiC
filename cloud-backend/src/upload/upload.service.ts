@@ -29,7 +29,7 @@ export class UploadService {
 
     const validatorFiles = await this.validateFiles(files)
 
-    // console.log(validatorFiles, files)
+    console.log(validatorFiles, 'null인데 왜저장?')
     
     this.filesRepository.insert(validatorFiles)
 
@@ -37,27 +37,24 @@ export class UploadService {
 
   async validateFiles(files: ModifiedFile[]){
     const filenames = files.map( file =>  file.fileName );
-    const directories = files.map(file => file.directory);
+    const directories = files.map(file => file.directory ?? null);
     const userId = files[0].userId
-    
-    const validatorFiles = await this.filesRepository
-      .createQueryBuilder()
-      .where('file_name IN (:...names)', { names: filenames })
-      .andWhere('directory = :directory', { directory: directories })
-      .andWhere('user_id_id = :userId', { userId: userId })
-      .getMany();
-    
-    validatorFiles.forEach(validator => {
-      for (let i = files.length - 1; i >= 0; i--) {
-        const file = files[i];
-        if (validator.fileName === file.fileName && validator.directory === file.directory) {
-          files.splice(i, 1);
-        }
-      }
-    });
+    const uniqueFiles: ModifiedFile[] = [];
 
-    // console.log(files, validatorFiles, '??')
-    return validatorFiles
+    for (const file of files) {
+      const existingFile = await this.filesRepository
+        .createQueryBuilder('file')
+        .where('file.fileName = :fileName', { fileName: file.fileName })
+        .andWhere('(file.directory = :directory OR file.directory IS NULL)',
+          { directory: file.directory ?? null })
+        .andWhere('file.userId = :userId', { userId })
+        .getOne();
+  
+      // console.log(existingFile,'중복 파일', file.fileName, file.directory)
+      if (!existingFile) uniqueFiles.push(file)
+    }
+
+    return uniqueFiles
   }
 
   async createPathFiles(files: ModifiedFile[] | Files[]){
@@ -67,7 +64,7 @@ export class UploadService {
     const folders = []
 
     files.forEach( file => {
-      file.directory.reduce( (acc: ModifiedFolder[], current: string, index:number, arr: string[] ) => {
+      file.directory.split('/').reduce( (acc: ModifiedFolder[], current: string, index:number, arr: string[] ) => {
         const existingFolder = acc.find(folder => folder.folderName == current && folder.depth == index);
 
         const folder = new Folders();

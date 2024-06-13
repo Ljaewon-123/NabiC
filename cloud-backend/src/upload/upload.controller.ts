@@ -47,7 +47,6 @@ export class UploadController {
         userId: userId,
         lastModified: isArray(lastModified) ? lastModified[index] : lastModified,
         lastModifiedDate: isArray(lastModifiedDate) ? lastModifiedDate[index] : lastModifiedDate,
-
         fileName : file.originalname,
         file : file.buffer,
         fileType : file.mimetype,
@@ -88,7 +87,7 @@ export class UploadController {
         userId: userId,
         lastModified: isArray(lastModified) ? lastModified[index] : lastModified,
         lastModifiedDate: isArray(lastModifiedDate) ? lastModifiedDate[index] : lastModifiedDate,
-        directory: nameArray,
+        directory: nameArray.join('/'),
         fileName : fileName[0],
         file : file.buffer,
         fileType : file.mimetype,
