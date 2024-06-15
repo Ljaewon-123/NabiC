@@ -123,58 +123,21 @@
 import { ref, type Ref } from 'vue';
 import { useFileDialog } from '@vueuse/core'
 import { naviapi, upload } from '@/boots/AxiosInstance';
+import { useUpload } from '@/stores/upload';
+import { storeToRefs } from 'pinia';
 
-interface Files extends File {
-  lastModifiedDate: Date
-}
 
 const { 
-  files: folder, 
-  open: folderOpen, 
-  reset: folderReset, 
-  onChange: folderOnChange 
-  } = useFileDialog({
-  directory: true
-})
-const { files, open, reset, onChange } = useFileDialog()
+  onChange, 
+  folderOnChange ,
+  folderOpen,
+  open,
+} = useUpload()
+const uploadStore = useUpload()
+// 전역으로 files가 유지되면.. 단점.. 안바뀔지도?? reset으로 해결??
+// 현재 파일들 어디서나 가져올수있는건 괜찮음 
+const { files } = storeToRefs(uploadStore)
 
-onChange(async (files: FileList | null) => {
-  if(!files) return 
-
-  const formData = new FormData();
-
-  Object.keys(files).forEach( (fileIndex: string) => {
-
-    const file = files[Number(fileIndex)] as Files
-    
-    formData.append('files', file, file.name );
-
-    formData.append('lastModified',  String(file.lastModified) )
-    formData.append('lastModifiedDate', String(file.lastModifiedDate) )
-  })
-
-  console.log(files, typeof files)
-  await upload.post('files', formData)
-
-})
-
-folderOnChange( async( folders: FileList | null ) => {
-  if(!folders) return 
-
-  const files = folder.value as FileList 
-  console.log(files, 'folder???', typeof files)
-
-  const formData = new FormData();
-
-  // webkitRelativePath
-  Object.keys(files).forEach( (fileIndex: string) => {
-    formData.append('pathFiles', files[Number(fileIndex)] );
-  })
-
-  
-  await upload.post('folder', formData)
-  
-})
 
 
 const allCheck = ref<boolean>(false)

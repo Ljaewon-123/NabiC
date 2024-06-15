@@ -6,6 +6,19 @@
   </template>
 
   <v-app-bar-title>Application Bar</v-app-bar-title>
+
+  <v-spacer></v-spacer>
+
+  <theme-switch ></theme-switch>
+
+  <v-icon>mdi-account</v-icon>
+  <v-icon>mdi-account</v-icon>
+  <v-icon>mdi-account</v-icon>
+  <v-icon>mdi-account</v-icon>
+  <v-icon>mdi-account</v-icon>
+  <v-icon>mdi-account</v-icon>
+  <v-icon>mdi-account</v-icon>
+
 </v-app-bar>
 
 <v-navigation-drawer
@@ -92,6 +105,7 @@ height="140" elevation="0" >
 <script setup lang="ts">
 import { ref } from 'vue'
 import FileTopbar from '@/components/FileTopbar.vue';
+import ThemeSwitch from '@/components/ThemeSwitch.vue'
 
 const drawer = ref()
 const spareCapacity = ref(30)

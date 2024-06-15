@@ -3,57 +3,13 @@
 
   <v-row class="mt-2">
     <v-col class="d-flex ga-3">
-
-      <v-card
+      <!-- '/assets/images/svgs/folder-fill.svg' -->
+      <file-box
         v-for="file in files"
         :key="file.id"
-        v-ripple
-        class="files pa-auto"
-        :image="'/assets/images/svgs/folder-fill.svg'"
-        width="150"
-        height="150"
-        @mouseover="mouseover = true"
-        @mouseleave="mouseover = false"
-        style="cursor: pointer;"
-      >
-        <template v-if="mouseover" #actions>
-
-          <v-checkbox
-            v-model="fileCheck"
-            color="blue-darken-4"
-            hide-details
-          ></v-checkbox>  
-
-          <v-spacer></v-spacer>
-
-          <v-btn
-            color="blue-darken-4"
-            v-model="star"
-            @click="star = !star"
-            :icon="star ? 'mdi-star' : 'mdi-star-outline' "
-          ></v-btn>
-        </template>
-        
-      </v-card>
-
-      <div>
-        aefg
-        <img :src="imageSrc" alt="뭐야" />
-      </div>
-      <div>
-        <input
-          type="file"
-          accept="image/png, image/jpeg"
-          @change="image = $event.target.files[0]"
-        />
-        <br />
-        <img v-if="image" :src="base64" width="200" />
-        <strong>{{  image }}</strong>
-      </div>
-      <!-- <div>
-        <v-btn @click="">test</v-btn>
-        <div ref="preview"></div>
-      </div> -->
+        :item="file"
+        :is-folder="file.fileType"
+      ></file-box>
 
     </v-col>
   </v-row>
@@ -64,22 +20,9 @@
 import { naviapi } from '@/boots/AxiosInstance';
 import type { Buffer } from 'buffer';
 import { ref, onMounted, computed, watchEffect } from 'vue'
-import { useRouter } from 'vue-router';
-import { useBase64 } from '@vueuse/core'
+import FileBox from '@/components/FileBox.vue';
+import type { Folder, File } from '@/types/FileBox';
 
-interface File {
-  fileName: string
-  fileType:  string
-  file: { data: Buffer }
-  id: number
-  lastModified:  string
-  lastModifiedDate:  string
-  size: number
-}
-interface Folder{
-  depth: number
-  folderName: string
-}
 
 const fileCheck = ref(false)
 
@@ -101,17 +44,23 @@ console.log(data)
 files.value = data.files
 folders.value = data.folders
 
+const fileRender = (buffer: Buffer, type: string) => {
+  // 이미지 , 문서 , 오디오만 보여주면됨 
+  if(type.startsWith('image')){
+    const blob = new Blob([new Uint8Array(buffer)]);
+    const imageUrl = URL.createObjectURL(blob);
+    return imageUrl
+  }
+
+  return 
+}
+
+// buffer image보여주기 
 const imgBuffer = data.files[0].file.data;
-
-const { base64: test } = useBase64(files.value[0].file.data)
-
-const image = ref('');
-const { base64 } = useBase64(image);
-const test2 = ref()
 
 console.log(imgBuffer)
 const imageSrc = ref()
-const blob = new Blob([new Uint8Array(imgBuffer)], { type: 'image/png' });
+const blob = new Blob([new Uint8Array(imgBuffer)], { type: 'image' });
 const imageUrl = URL.createObjectURL(blob);
 imageSrc.value = imageUrl;
 

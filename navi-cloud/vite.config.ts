@@ -3,9 +3,6 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-import pages from 'vite-plugin-pages';
-import Layouts from 'vite-plugin-vue-layouts';
-
 import electron from 'vite-plugin-electron/simple'
 import path from 'node:path';
 
