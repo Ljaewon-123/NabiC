@@ -50,11 +50,12 @@ const switchTheme = async() => {
 const toggleDark = useToggle(isDark)
 const current = computed(() => theme.global.name.value == 'dark' ? 18 : 0)
 
-watchPostEffect( () => {
+watch(theme.global.name, () => {
+  // alert('??')
   setTimeout(() => {
     toggleDark()
   },300)
-})
+},{flush:'post'})
 
 </script>
 
