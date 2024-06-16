@@ -55,7 +55,7 @@ import { VSnack } from '@/utils';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
 
-const { setAccessToken } = useAuthStore()
+const { setToken } = useAuthStore()
 
 localStorage.clear()
 
@@ -86,7 +86,7 @@ const submitHandler = async() => {
       password: password.value,
     })
 
-    setAccessToken(sign.data)
+    setToken(sign.data)
   }
   catch{
     snack.showSnack('Fail Signup', 'error')

@@ -31,7 +31,7 @@ export class AuthService {
     return tokens
   }
 
-  async signin(dto: AuthDto): Promise<string> {
+  async signin(dto: AuthDto): Promise<Tokens> {
     const user = await this.userRepository.findOne({
       where:{
         email: dto.email
@@ -48,7 +48,7 @@ export class AuthService {
     const tokens = await this.getToken(user.id, user.email);
     // await this.updateRtHash(user.id, tokens.refresh_token);
 
-    return tokens.access_token;
+    return tokens;
   }
 
   async logout(userId: number) {
@@ -68,7 +68,8 @@ export class AuthService {
     });
     if (!user || !user.hashedRt) throw new ForbiddenException('Access Denied');
 
-    const rtMatches = await bcrypt.compare(user.hashedRt, rt);
+    const rtMatches = await bcrypt.compare(rt, user.hashedRt);
+    // console.log(user, '다시다시 !', rtMatches)
     if (!rtMatches) throw new ForbiddenException('Access Denied');
 
     const tokens = await this.getToken(user.id, user.email);

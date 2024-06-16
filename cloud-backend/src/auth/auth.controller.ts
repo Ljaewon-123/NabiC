@@ -19,7 +19,7 @@ export class AuthController {
   @Public()
   @Post('signin')
   @HttpCode(HttpStatus.OK)
-  signinLocal(@Body() dto: AuthDto): Promise<string> {
+  signinLocal(@Body() dto: AuthDto): Promise<Tokens> {
     return this.authService.signin(dto)
   }
 

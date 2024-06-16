@@ -3,7 +3,7 @@ import { useAuthStore } from "@/stores/auth";
 import axios, { AxiosError } from "axios";
 import { refresh } from "./refresh";
 
-const { setAccessToken, getAccessToken } = useAuthStore()
+const { setAccessToken, getAccessToken, setToken } = useAuthStore()
 
 export class AxiosAPI {
 
@@ -34,11 +34,14 @@ export class AxiosAPI {
         const { config, response: { status }} = error
   
         if( status == 401 ){
-          this.throwReq()
+          // alert(getAccessToken())
+          await this.throwReq()
+          // alert(getAccessToken())
+          return instance.request(config)
+
         }
   
-  
-        return error
+        return Promise.reject(error)
       }, { synchronous: true }
     )
     
@@ -48,11 +51,11 @@ export class AxiosAPI {
   protected async throwReq(){
     try{
       const response = await refresh.post('auth/refresh')
-      const { access_token } = response.data
+      const tokens = response.data
 
       console.log(response.data)
 
-      setAccessToken(access_token)
+      setToken(tokens)
     }
     catch (e: any){
       console.log(e)

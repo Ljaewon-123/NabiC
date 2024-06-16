@@ -32,7 +32,8 @@ export class AxiosUpload extends AxiosAPI {
         const { config, response: { status }} = error
   
         if( status == 401 ){
-          this.throwReq()
+          await this.throwReq()
+          return instance.request(config)
         }
   
   

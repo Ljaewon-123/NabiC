@@ -4,7 +4,7 @@ import axios, { AxiosError } from "axios";
 import { AxiosAPI } from ".";
 
 const API_URL = import.meta.env.VITE_APP_URL
-const { setAccessToken, getAccessToken } = useAuthStore()
+const { setAccessToken, getAccessToken, getRefreshToken } = useAuthStore()
 
 class AxiosRefresh {
   create(baseURL: string, options?: any) {
@@ -16,7 +16,7 @@ class AxiosRefresh {
     instance.interceptors.request.use(
       config => {
   
-        config.headers['Authorization'] = "Bearer " + `${getAccessToken()}`
+        config.headers['Authorization'] = "Bearer " + `${getRefreshToken()}`
   
         return config
       }
@@ -28,7 +28,7 @@ class AxiosRefresh {
       },
       async (error) => {
   
-        console.log('최종 반환')
+        console.log('최종 반환', error)
         // 인증 최종 return 
         localStorage.clear()
         router.push({ name: 'Login' })
