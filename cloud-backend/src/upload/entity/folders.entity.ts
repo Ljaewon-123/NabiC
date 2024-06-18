@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Files } from './files.entity';
 import { ModifiedFile } from '../types';
+import { Matches } from 'class-validator';
 
 // 빈폴더만 있을경우.....
 @Entity()
@@ -19,6 +20,7 @@ export class Folders {
   id: number;
 
   @Column()
+  @Matches(/^[^\\\/:*?"<>|]+$/, { message: 'Folder contains invalid characters.' })
   folderName: string
 
   @Column()

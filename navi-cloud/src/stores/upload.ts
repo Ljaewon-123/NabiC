@@ -39,6 +39,9 @@ export const useUpload = defineStore('upload', () => {
   
   })
   
+  // 빈폴더만 선택하면 아무것도 안온다 
+  // 실직적으로 폴더 전송은 내부 파일만 보내는 거라서
+  // 그래서 폴더 생성이 따로있는건가?? 
   folderOnChange( async( folders: FileList | null ) => {
     if(!folders) return 
   

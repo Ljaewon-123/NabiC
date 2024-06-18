@@ -36,8 +36,6 @@ export class UploadService {
   }
 
   async validateFiles(files: ModifiedFile[]){
-    const filenames = files.map( file =>  file.fileName );
-    const directories = files.map(file => file.directory ?? null);
     const userId = files[0].userId
     const uniqueFiles: ModifiedFile[] = [];
 
@@ -57,6 +55,9 @@ export class UploadService {
     return uniqueFiles
   }
 
+  // 빈폴더만 선택하면 아무것도 안온다 
+  // 실직적으로 폴더 전송은 내부 파일만 보내는 거라서
+  // 그래서 폴더 생성이 따로있는건가?? 
   async createPathFiles(files: ModifiedFile[] | Files[]){
 
     // console.log(files, 'files!!!')
@@ -97,13 +98,17 @@ export class UploadService {
     const depths = folders.map(folder => folder.depth);
     const userId = folders[0].userId
 
-    const validatorFolder = await this.foldersRepository
-    .createQueryBuilder()
-    .where('folder_name IN (:...names)', { names: folderNames })
-    .andWhere('depth IN (:...depths)', { depths: depths })
-    .andWhere('user_id_id = :userId',{ userId: userId })
-    .getMany();
+    // 객체로 안해도되나? 
+    const validatorFolder = await this.validatorFolders({
+      folderNames, depths, userId
+    })
 
+    if(validatorFolder.length == 0) {
+      const vaildate = await this.validateFiles(files)
+      await this.filesRepository.save(vaildate)
+      await this.foldersRepository.save(folders)
+      return 
+    } 
 
     validatorFolder.forEach(validator => {
       for (let i = folders.length - 1; i >= 0; i--) {
@@ -121,6 +126,56 @@ export class UploadService {
     await this.filesRepository.save(vaildate)
     await this.foldersRepository.save(folders)
 
+  }
+
+  async validatorFolder(
+    { folderName, depth, userId }: 
+    { 
+      folderName: string, 
+      depth: number, 
+      userId: number 
+    }
+  ): Promise<Folders>{
+    const validatorFolder = await this.foldersRepository
+      .createQueryBuilder()
+      .where('folder_name = :name', { name: folderName })
+      .andWhere('depth = :depth', { depth: depth })
+      .andWhere('user_id_id = :userId',{ userId: userId })
+      .getOne();
+
+    return validatorFolder
+  }
+
+  async validatorFolders(
+    { folderNames, depths, userId }: 
+    { folderNames: string[], 
+      depths: number[], 
+      userId: number }
+  ): Promise<Folders[]>{
+    const validatorFolders = await this.foldersRepository
+      .createQueryBuilder()
+      .where('folder_name IN (:...names)', { names: folderNames })
+      .andWhere('depth IN (:...depths)', { depths: depths })
+      .andWhere('user_id_id = :userId',{ userId: userId })
+      .getMany();
+
+    return validatorFolders
+  }
+
+  async createOneFolder(userId:number, folderName: string, depth:number){
+    const validate = await this.validatorFolder({folderName, userId, depth})
+
+    console.log(validate, 'validate')
+    if(validate) throw 'faile'
+
+    const folder = this.foldersRepository.create({
+      folderName: folderName,
+      depth: depth,
+      userId: userId
+    })
+
+    await this.foldersRepository.save(folder)
+    return 'done!'
   }
 
   // 하나로 합쳐?? 아니면 분리상태로??

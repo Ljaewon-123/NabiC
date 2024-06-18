@@ -4,6 +4,7 @@ import { AnyFilesInterceptor, FileFieldsInterceptor, FileInterceptor, FilesInter
 import { GetCurrentUserId } from 'src/common/decorators';
 import { isArray } from 'class-validator';
 import { Files } from './entity/files.entity';
+import { FolderDto } from './dto';
 
 // 이름이 같으면 -copy (n) , _copy (n)
 // 혹은 fe에서 거부?? 명단을 가지고있으니까 
@@ -100,7 +101,15 @@ export class UploadController {
     console.log(pathFiles)
   }
 
-
+  @Post('create/folder')
+  @HttpCode(HttpStatus.CREATED)
+  async createFolder(
+    @GetCurrentUserId() userId: number,
+    @Body() dto: FolderDto,
+  ){
+    console.log(dto)
+    return await this.uploadService.createOneFolder(userId, dto.fileName, dto.depth)
+  }
 
 
 

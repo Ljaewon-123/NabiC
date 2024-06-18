@@ -5,7 +5,7 @@
     <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
   </template>
 
-  <v-app-bar-title>Application Bar</v-app-bar-title>
+  <v-app-bar-title>MY CLOUD</v-app-bar-title>
 
   <v-spacer></v-spacer>
 

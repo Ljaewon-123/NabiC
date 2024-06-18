@@ -4,7 +4,7 @@
   <v-row>
     <v-col>
       <span class="main-title">
-        MY CLOUD
+        ROOT
       </span>
     </v-col>
   </v-row>
@@ -101,12 +101,18 @@
         placeholder="Foler Name"
         persistent-hint
         density="comfortable"
+        :rules="requiredArr"
       ></v-text-field>
     </template>
     <template #actions>
       <v-spacer></v-spacer>
 
-      <v-btn color="primary" variant="tonal" @click="newFolder = false">
+      <v-btn 
+        color="primary" 
+        variant="tonal" 
+        @click="newFolder = false, createFolder()"
+        @keyup.enter="createFolder()"
+      >
         Save
       </v-btn>
 
@@ -120,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
+import { ref, watch, watchEffect, type Ref } from 'vue';
 import { useFileDialog } from '@vueuse/core'
 import { naviapi, upload } from '@/boots/AxiosInstance';
 import { useUpload } from '@/stores/upload';
@@ -138,13 +144,29 @@ const uploadStore = useUpload()
 // 현재 파일들 어디서나 가져올수있는건 괜찮음 
 const { files } = storeToRefs(uploadStore)
 
-
-
 const allCheck = ref<boolean>(false)
 const toggleBtn = ref()
 const newFolder = ref<boolean>(false)
-const newFolderName = ref<string>()
+const newFolderName = ref<string>('')
 
+const createFolder = async() => {
+  if(!newFolderName.value) return '전역 얼럿'
+  const result = await naviapi.post('upload/create/folder', {
+    fileName: newFolderName.value,
+    depth: 0
+  });
+
+  console.log(result)
+}
+
+const requiredArr = [
+  (v:string) => !!v || 'Field is required',
+  (v: string) => /^[^\\\\/:*?"<>|]+$/.test(v) || "Don't use symbol",
+]
+
+watch(newFolder, () => {
+  newFolderName.value = ''
+})
 
 
 </script>

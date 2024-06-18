@@ -4,11 +4,18 @@
   <v-row class="mt-2">
     <v-col class="d-flex ga-3">
       <!-- '/assets/images/svgs/folder-fill.svg' -->
+
+      <file-box
+        v-for="folder in folders"
+        :key="folder.id"
+        :item-folder="folder"
+      ></file-box>
+
       <file-box
         v-for="file in files"
         :key="file.id"
         :item="file"
-        :is-folder="file.fileType"
+        :item-type="file.fileType"
       ></file-box>
 
     </v-col>
@@ -20,7 +27,6 @@
 import { naviapi } from '@/boots/AxiosInstance';
 import type { Buffer } from 'buffer';
 import { ref, onMounted, computed, watchEffect } from 'vue'
-import FileBox from '@/components/FileBox.vue';
 import type { Folder, File } from '@/types/FileBox';
 
 

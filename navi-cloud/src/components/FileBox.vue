@@ -1,9 +1,12 @@
 <template>
 <div>
+  <!-- '/assets/images/svgs/folder-fill.svg' -->
   <v-card
     v-ripple
     class="files pa-auto"
-    :image="fileRender(props.item.file.data, props.item.fileType)"
+    :image="
+      !props.itemType ? FOLDER_IMAGE : fileRender(props.item?.file.data, props.item?.fileType)
+    "
     width="150"
     height="150"
     @mouseover="mouseover = true"
@@ -33,35 +36,43 @@
     
   </v-card>
   <div>
-    <div>{{ props.item.fileName }}</div>
-    <div>{{ props.item.size }}</div>
+    <solt>
+      <div class="text-center">
+        {{ props.item?.fileName || props.itemFolder?.folderName }}
+      </div>
+      <div class="text-center">
+        {{ formatBytes(props.item?.size) }}
+      </div>
+    </solt>
   </div>
 </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import type { Buffer } from 'buffer';
 import type { PropType } from 'vue'
-import type { File } from '@/types/FileBox';
+import type { File, Folder } from '@/types/FileBox';
+import { formatBytes } from '@/utils'
 
 const props = defineProps({
-  item: {
-    type: Object as PropType<File>,
-    required: true
-  },
-  isFolder: String
+  item: Object as PropType<File>,
+  itemFolder: Object as PropType<Folder>,
+  itemType: String  // undefined이면 폴더 
 })
 
 const isFolder = computed(() => {
-  if(!props.isFolder) return false
-  if(props.isFolder?.startsWith('image')) return false
+  if(!props.itemType) return false
+  if(props.itemType?.startsWith('image')) return false
 
   return true
 })
 
-const fileRender = (buffer: Buffer, type: string) => {
+const FOLDER_IMAGE = '/assets/images/svgs/folder-fill.svg'
+
+const fileRender = (buffer: Buffer, type?: string) => {
   if(isFolder.value) return 
+  if(!type) return  // why??/ undefined안해주고싶은데 
   // 이미지 , 문서 , 오디오만 보여주면됨 
   if(type.startsWith('image')){
     const blob = new Blob([new Uint8Array(buffer)]);
