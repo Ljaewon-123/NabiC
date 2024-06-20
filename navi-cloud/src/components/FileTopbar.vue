@@ -64,8 +64,8 @@
               ></v-btn>
             </template>
 
-            <v-btn>최신순</v-btn>
-            <v-btn>업로드순</v-btn>
+            <v-btn :key="1" >최신순</v-btn>
+            <v-btn :key="2" >업로드순</v-btn>
           </v-speed-dial>
 
           <v-btn-toggle

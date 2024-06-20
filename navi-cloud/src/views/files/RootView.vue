@@ -8,6 +8,7 @@
       <file-box
         v-for="folder in folders"
         :key="folder.id"
+        @click="pushRouter"
         :item-folder="folder"
       ></file-box>
 
@@ -28,21 +29,17 @@ import { naviapi } from '@/boots/AxiosInstance';
 import type { Buffer } from 'buffer';
 import { ref, onMounted, computed, watchEffect } from 'vue'
 import type { Folder, File } from '@/types/FileBox';
+import { useRouter } from 'vue-router';
 
+const router = useRouter()
 
-const fileCheck = ref(false)
-
-const mouseover = ref(false)
-const star = ref(false)
+const pushRouter = () => {
+  router.push({ name: 'Path', params: { folder: 'haha', depth: 1 } })
+}
 
 const files = ref<File[]>([])
 const folders = ref<Folder[]>([])
-const userItems = computed(() => {
-  return {
-    files: files.value,
-    folders: folders.value
-  }
-})
+
 
 const getUserData = await naviapi.get('user-data')
 const data = getUserData.data
@@ -50,33 +47,6 @@ console.log(data)
 files.value = data.files
 folders.value = data.folders
 
-const fileRender = (buffer: Buffer, type: string) => {
-  // 이미지 , 문서 , 오디오만 보여주면됨 
-  if(type.startsWith('image')){
-    const blob = new Blob([new Uint8Array(buffer)]);
-    const imageUrl = URL.createObjectURL(blob);
-    return imageUrl
-  }
-
-  return 
-}
-
-// buffer image보여주기 
-const imgBuffer = data.files[0].file.data;
-
-console.log(imgBuffer)
-const imageSrc = ref()
-const blob = new Blob([new Uint8Array(imgBuffer)], { type: 'image' });
-const imageUrl = URL.createObjectURL(blob);
-imageSrc.value = imageUrl;
-
-function readFile() {
-  const file = files.value[0].file.data; // 첨부된 파일을 가져옴
-  
-  const reader = new FileReader();
-
-
-}
 
 
 </script>

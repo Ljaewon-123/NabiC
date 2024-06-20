@@ -48,9 +48,9 @@ const router = createRouter({
           component: () => import('@/views/files/RootView.vue') 
         },
         { 
-          path: '/main/path:directory', 
+          path: '/main/path/:folder/dp/:depth', 
           name: 'Path',
-          component: () => import('@/views/files/FilderContents.vue') 
+          component: () => import('@/views/files/FolderContents.vue') 
         },
       ],
     },

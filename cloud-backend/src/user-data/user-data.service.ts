@@ -18,7 +18,7 @@ export class UserDataService {
     private foldersRepository: Repository<Folders>,
   ){}
 
-  async test(userId: number){
+  async rootData(userId: number){
     const result = await this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.files', 'files', 'files.directory IS NULL')
@@ -42,4 +42,9 @@ export class UserDataService {
     console.log(result)
     return result;
   }
+
+  async folderData(){
+    
+  }
+
 }
