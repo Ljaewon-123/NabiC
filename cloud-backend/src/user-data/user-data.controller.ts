@@ -21,9 +21,8 @@ export class UserDataController {
     @GetCurrentUserId() userId: number,
     @Body() folderDataDto: FolderDataDto ,
     @Body('folder') folder : string,
-    @Body('depth',ParseIntPipe) depth : number
   ){
-    console.log(userId, folderDataDto, folder, depth)
-    // return this.userDataService.folderData(userId)
+    console.log(userId, folderDataDto, folder)
+    return this.userDataService.folderInnerData(userId, folder)
   }
 }

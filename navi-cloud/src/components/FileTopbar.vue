@@ -131,7 +131,9 @@ import { useFileDialog } from '@vueuse/core'
 import { naviapi, upload } from '@/boots/AxiosInstance';
 import { useUpload } from '@/stores/upload';
 import { storeToRefs } from 'pinia';
+import { useRoute } from 'vue-router';
 
+const route = useRoute()
 
 const { 
   onChange, 
@@ -150,10 +152,11 @@ const newFolder = ref<boolean>(false)
 const newFolderName = ref<string>('')
 
 const createFolder = async() => {
-  if(!newFolderName.value) return '전역 얼럿'
+  if(!newFolderName.value) return '전역 얼럿 띄우는 기능 추가 '
   const result = await naviapi.post('upload/create/folder', {
     fileName: newFolderName.value,
-    depth: 0
+    depth: 0, // 임시로 0 
+    parent: route.params.folderName
   });
 
   console.log(result)

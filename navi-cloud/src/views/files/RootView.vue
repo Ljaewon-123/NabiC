@@ -8,7 +8,7 @@
       <file-box
         v-for="folder in folders"
         :key="folder.id"
-        @click="pushRouter"
+        @click="pushRouter(folder.folderName)"
         :item-folder="folder"
       ></file-box>
 
@@ -28,18 +28,24 @@
 import { naviapi } from '@/boots/AxiosInstance';
 import type { Buffer } from 'buffer';
 import { ref, onMounted, computed, watchEffect } from 'vue'
-import type { Folder, File } from '@/types/FileBox';
-import { useRouter } from 'vue-router';
+import type { Folder, UserFile } from '@/types/FileBox';
+import { useRoute, useRouter } from 'vue-router';
+// import { pushRouter } from '@/utils';
 
 const router = useRouter()
+const route = useRoute()
+const pushRouter = (folderName: string) => {
+  router.push({ 
+    name: 'Path', 
+    params: { 
+      folder: folderName, 
+      depth: route.meta.depth as number
+    } 
+  })
 
-const pushRouter = () => {
-  router.push({ name: 'Path', params: { folder: 'haha', depth: 1 } })
 }
-
-const files = ref<File[]>([])
+const files = ref<UserFile[]>([])
 const folders = ref<Folder[]>([])
-
 
 const getUserData = await naviapi.get('user-data')
 const data = getUserData.data

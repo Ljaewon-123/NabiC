@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { useFileDialog } from '@vueuse/core'
 import { upload } from '@/boots/AxiosInstance'
+import { useRoute } from 'vue-router'
 
 interface Files extends File {
   lastModifiedDate: Date
@@ -8,6 +9,8 @@ interface Files extends File {
 
 // 이미 있는이름같은데 
 export const useUpload = defineStore('upload', () => {
+
+  const route = useRoute()
 
   const { 
     files: folder, 
@@ -37,6 +40,7 @@ export const useUpload = defineStore('upload', () => {
     console.log(files, typeof files)
     await upload.post('files', formData)
   
+    reset()
   })
   
   // 빈폴더만 선택하면 아무것도 안온다 
@@ -52,12 +56,17 @@ export const useUpload = defineStore('upload', () => {
   
     // webkitRelativePath
     Object.keys(files).forEach( (fileIndex: string) => {
-      formData.append('pathFiles', files[Number(fileIndex)] );
+      const file = files[Number(fileIndex)] as Files
+      formData.append('pathFiles', file );
+      formData.append('lastModified',  String(file.lastModified) )
+      formData.append('lastModifiedDate', String(file.lastModifiedDate) )
     })
   
+    formData.append('parentName', route.params.folder as string );
     
     await upload.post('folder', formData)
     
+    folderReset()
   })
 
   return {

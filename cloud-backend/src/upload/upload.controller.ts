@@ -5,6 +5,7 @@ import { GetCurrentUserId } from 'src/common/decorators';
 import { isArray } from 'class-validator';
 import { Files } from './entity/files.entity';
 import { FolderDto } from './dto';
+import { UndefinedPipe } from 'src/pipes/undefined-pipe';
 
 // 이름이 같으면 -copy (n) , _copy (n)
 // 혹은 fe에서 거부?? 명단을 가지고있으니까 
@@ -74,9 +75,13 @@ export class UploadController {
   async uploadMultiFile(
     @UploadedFiles() pathFiles: Express.Multer.File[] ,
     @GetCurrentUserId() userId: number,
-    @Body() body: {lastModified: string | string[], lastModifiedDate: string | string[]}
+    @Body() body: {
+      lastModified: string | string[], 
+      lastModifiedDate: string | string[],
+    },
+    @Body('parent', UndefinedPipe) parent: string | undefined
   ) {
-    console.log('arrive')
+    // console.log('arrive',parent, typeof parent )
     
     const lastModified = body.lastModified
     const lastModifiedDate = body.lastModifiedDate
@@ -96,7 +101,7 @@ export class UploadController {
       })
     })
 
-    await this.uploadService.createPathFiles(newFileArray)
+    await this.uploadService.createPathFiles(newFileArray, parent )
     
     console.log(pathFiles)
   }
@@ -108,7 +113,7 @@ export class UploadController {
     @Body() dto: FolderDto,
   ){
     console.log(dto)
-    return await this.uploadService.createOneFolder(userId, dto.fileName, dto.depth)
+    return await this.uploadService.createOneFolder(userId, dto)
   }
 
 

@@ -1,4 +1,4 @@
-export interface File {
+export interface UserFile {
   fileName: string
   fileType:  string
   file: { data: Buffer }

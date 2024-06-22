@@ -21,8 +21,8 @@ export class UserDataService {
   async rootData(userId: number){
     const result = await this.userRepository
       .createQueryBuilder('user')
-      .leftJoinAndSelect('user.files', 'files', 'files.directory IS NULL')
-      .leftJoinAndSelect('user.folders', 'folders', 'folders.depth = 0')
+      .leftJoinAndSelect('user.files', 'files', 'files.directory = \'/\' ')
+      .leftJoinAndSelect('user.folders', 'folders', 'folders.parent = :rootParent', { rootParent: 'root' })
       .select([
         'user.id',
         'files.id',
@@ -34,7 +34,6 @@ export class UserDataService {
         'files.lastModifiedDate',
         'folders.id',
         'folders.folderName',
-        'folders.depth'
       ])
       .where('user.id = :userId', { userId })
       .getOne();
@@ -43,8 +42,20 @@ export class UserDataService {
     return result;
   }
 
-  async folderData(){
-    
+  // relations: {
+//   categories: true,
+// },
+  async folderInnerData(userId: number, folderName: string) {
+    const result = await this.foldersRepository
+      .createQueryBuilder('folder')
+      .leftJoinAndSelect('folder.file', 'file')
+      .where('folder.userId = :userId', { userId })
+      .andWhere('folder.folderName = :folderName', { folderName })
+      .orWhere('folder.parent = :folderName', { folderName }) 
+      .getMany();
+
+    console.log(result, 'what inner folder data?');
+    return result;
   }
 
 }

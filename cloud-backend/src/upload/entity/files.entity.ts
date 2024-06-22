@@ -10,8 +10,9 @@ import {
 } from 'typeorm';
 import { Folders } from './folders.entity';
 
+// 스키마에 제대로 되어있는거 같은데 동시에 자꾸 들어가지네 왜지??
 @Entity()
-@Unique(['fileName', 'directory'])
+@Unique(['fileName', 'directory', 'id'])
 export class Files {
   @PrimaryGeneratedColumn()
   id: number;
@@ -28,7 +29,7 @@ export class Files {
   @Column()
   fileType: string
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ default: '/' })
   directory: string
 
   @Column()

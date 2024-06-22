@@ -1,15 +1,55 @@
 <template>
-  <h1>test? {{ route.params }}</h1>
-  <h2>result {{ result.data }}</h2>
+<v-container fluid class="h-100" >
+
+<v-row class="mt-2">
+  <v-col class="d-flex ga-3">
+
+    {{ route.params.folder }}
+    //
+    <br>
+    {{ result.data }}
+    <!-- <file-box
+      v-for="folder in folders"
+      :key="folder.id"
+      @click="pushRouter"
+      :item-folder="folder"
+    ></file-box>
+
+    <file-box
+      v-for="file in files"
+      :key="file.id"
+      :item="file"
+      :item-type="file.fileType"
+    ></file-box> -->
+
+  </v-col>
+</v-row>
+</v-container>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { naviapi } from '@/boots/AxiosInstance';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import type { Folder, UserFile } from '@/types/FileBox';
 
+const router = useRouter()
 const route = useRoute()
+const pushRouter = (folderName: string) => {
+  router.push({ 
+    name: 'Path', 
+    params: { 
+      folder: folderName, 
+      depth: route.meta.depth as number
+    } 
+  })
+
+}
+
+const files = ref<UserFile[]>([])
+const folders = ref<Folder>()
 
 const result = await naviapi.post('user-data', route.params)
 // { "folder": "haha", "depth": "1" }
+console.table(result.data)
 </script>

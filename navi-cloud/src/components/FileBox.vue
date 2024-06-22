@@ -61,12 +61,12 @@
 import { computed, ref, toRef } from 'vue'
 import type { Buffer } from 'buffer';
 import type { PropType } from 'vue'
-import type { File, Folder } from '@/types/FileBox';
+import type { UserFile, Folder } from '@/types/FileBox';
 import { formatBytes } from '@/utils'
 import { useEasyLightbox } from 'vue-easy-lightbox';
 
 const props = defineProps({
-  item: Object as PropType<File>,
+  item: Object as PropType<UserFile>,
   itemFolder: Object as PropType<Folder>,
   itemType: String  // undefined이면 폴더 
 })
