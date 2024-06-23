@@ -20,9 +20,8 @@ export class UserDataController {
   getFolderData(
     @GetCurrentUserId() userId: number,
     @Body() folderDataDto: FolderDataDto ,
-    @Body('folder') folder : string,
   ){
-    console.log(userId, folderDataDto, folder)
-    return this.userDataService.folderInnerData(userId, folder)
+    console.log(userId, folderDataDto)
+    return this.userDataService.folderInnerData(userId, folderDataDto)
   }
 }

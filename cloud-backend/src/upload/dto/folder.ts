@@ -10,8 +10,11 @@ export class FolderDto {
   // @IsNotEmpty()
   // @Min(0, { message: 'Depth must be a non-negative integer.' })
   // depth:number
-
   @IsOptional()
-  @IsString({ message: 'Parent must be a string or null.' })
-  parent: string | undefined
+  @IsString({ message: 'Directory must be a string or null.' })
+  directory: string | undefined
+
+  // @IsOptional()
+  // @IsString({ message: 'Parent must be a string or null.' })
+  // parent: string | undefined
 }

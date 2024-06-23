@@ -40,7 +40,7 @@ const pushRouter = (folderName: string) => {
     name: 'Path', 
     params: { 
       folder: folderName, 
-      depth: route.meta.depth as number
+      directory: `route.params.directory/${folderName}`
     } 
   })
 

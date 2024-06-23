@@ -45,11 +45,11 @@ const router = createRouter({
         { 
           path: '/main/root', 
           name: 'Root',
-          meta: { depth: 0 },
+          meta: { directory: '/' },
           component: () => import('@/views/files/RootView.vue')
         },
         { 
-          path: '/main/path/:folder/dp/:depth', 
+          path: '/main/path/:folder/dp/:directory', 
           name: 'Path',
           component: () => import('@/views/files/FolderContents.vue') 
         },

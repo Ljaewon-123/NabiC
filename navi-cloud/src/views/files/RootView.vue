@@ -2,7 +2,7 @@
 <v-container fluid class="h-100" >
 
   <v-row class="mt-2">
-    <v-col class="d-flex ga-3">
+    <v-col class="d-flex ga-3 flex-wrap">
       <!-- '/assets/images/svgs/folder-fill.svg' -->
 
       <file-box
@@ -39,7 +39,7 @@ const pushRouter = (folderName: string) => {
     name: 'Path', 
     params: { 
       folder: folderName, 
-      depth: route.meta.depth as number
+      directory: folderName
     } 
   })
 

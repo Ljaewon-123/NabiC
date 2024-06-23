@@ -17,8 +17,8 @@ import { Matches } from 'class-validator';
 // nullable값이 있으면 null은 유효성에 포함을 안하네 
 // 여기서 에러를 내면은 사실상 내가 체크안해도 되지않나?
 // 중복안된다고 완전히 거부를 하냐 중간에 받냐 차이?
+// @Unique(['folderName', 'parent', 'userId'])
 @Entity()
-@Unique(['folderName', 'parent', 'userId'])
 export class Folders {
   @PrimaryGeneratedColumn()
   id: number;
@@ -27,8 +27,8 @@ export class Folders {
   @Matches(/^[^\\\/:*?"<>|]+$/, { message: 'Folder contains invalid characters.' })
   folderName: string
 
-  @Column({ default: 'root' })
-  parent: string
+  @Column({ default: '/' })
+  directory: string
 
   @ManyToMany(() => Files,{
     cascade: true, nullable: true

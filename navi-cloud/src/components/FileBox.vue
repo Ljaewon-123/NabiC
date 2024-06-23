@@ -38,7 +38,7 @@
   </v-card>
   <div>
     <slot>
-      <div class="text-center">
+      <div class="text-center wrap-text">
         {{ props.item?.fileName || props.itemFolder?.folderName }}
       </div>
       <div class="text-center">
@@ -124,7 +124,11 @@ const mouseover = ref(false)
 </script>
 
 <style scoped>
-
+.wrap-text {
+  width: 150px;
+  word-wrap: break-word; /* 또는 overflow-wrap: break-word; */
+  white-space: normal;
+}
 </style>
 
 <style>

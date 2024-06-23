@@ -76,17 +76,17 @@ export class UploadService {
   // 빈폴더만 선택하면 아무것도 안온다 
   // 실직적으로 폴더 전송은 내부 파일만 보내는 거라서
   // 그래서 폴더 생성이 따로있는건가?? 
-  async createPathFiles(files: ModifiedFile[] | Files[], parent: string | null){
+  async createPathFiles(files: ModifiedFile[] | Files[]){
 
     const folders = []
 
     files.forEach( file => {
       const directorySegments = file.directory.split('/');
-      let currentParent = parent;
+      // let currentParent = parent;
       directorySegments.reduce( (acc: ModifiedFolder[], current: string, index:number, arr: string[] ) => {
         const existingFolder = acc.find(folder => folder.folderName == current );
 
-        if(index != 0) currentParent = arr[index - 1];
+        // if(index != 0) currentParent = arr[index - 1];
 
         const folder = new Folders();
 
@@ -101,7 +101,7 @@ export class UploadService {
           folder.folderName = current
           folder.file = index == arr.length - 1 ? [file] : []
           folder.userId = file.userId
-          folder.parent = currentParent ?? 'root'
+          folder.directory = directorySegments.length == 1 ? '/' : directorySegments.slice(0, -1).join('/');
           acc.push(folder)
         }
 
@@ -113,56 +113,47 @@ export class UploadService {
 
     const parentFolder = folders[0];
     const newParentName = await this.validatorFolder(parentFolder)
+    console.log('newname', newParentName)
+    // folders[0].folderName = newParentName.folderName
 
     const updatedChildFolders = await this.renameChildFolders(folders, parentFolder, newParentName.folderName);
-
-    // console.log(updatedChildFolders)
-    console.log(files)
-    for (const file of files) {
-      const directory = file.directory.split('/')
-      if(directory[0].startsWith(parentFolder.folderName)) {
-        directory[0] = updatedChildFolders[0].folderName
-      }
-    }
     
-    // *******************************
-    // 이걸안해도 유효성이 잡지만 해야하는 이유는 트랜잭션
-    // 중복안된 요소들은 넣어주고 싶어서 
-    // 내가 신규 폴더 와 안에있는 파일을 같이 집어넣으면 parent가 다다른데 
-    // 이걸 왜 검사함??? 
-
-    // *******************************
+    const renamedFiles = await this.renameFilesDirectory(files, parentFolder.folderName, newParentName.folderName);
+    
+    updatedChildFolders[0].folderName = newParentName.folderName
+    console.log(updatedChildFolders)
+    console.log('|||||||||')
+    console.log(renamedFiles)
 
 
     // m : m은 save여야 join까지 가나보네...
     // const vaildate = await this.validateFiles(files) // 안해도될듯?? 다 쌔거라서 어차피 경로다 다다름 
     
-    // await this.filesRepository.save(files)
-    // await this.foldersRepository.save(folders)
+    await this.filesRepository.save(files)
+    await this.foldersRepository.save(folders)
 
   }
 
   async validatorFolder(
-    { folderName, userId, parent }: 
+    { folderName, userId, directory }: 
     { 
       folderName: string, 
       userId: number, 
-      parent?: string 
+      directory:string,
     }
   ) {
-    parent = parent ?? 'root';
 
     // 중복된 폴더 이름이 있는지 확인
     let existingFolder = await this.foldersRepository
       .createQueryBuilder()
       .where('folder_name = :name', { name: folderName })
       .andWhere('user_id_id = :userId', { userId: userId })
-      .andWhere('parent = :parent', { parent: parent })
+      .andWhere('(directory = :directory )', { directory: directory ?? '/' })
       .getOne();
 
     // 중복되지 않으면 그대로 반환
     if (!existingFolder) {
-      return { folderName, userId, parent };
+      return { folderName, userId };
     }
 
     // 폴더 이름이 중복되는 경우 '-copy(n)'을 붙임
@@ -175,7 +166,7 @@ export class UploadService {
         .createQueryBuilder()
         .where('folder_name = :name', { name: newFolderName })
         .andWhere('user_id_id = :userId', { userId: userId })
-        .andWhere('parent = :parent', { parent: parent })
+        .andWhere('(directory = :directory )', { directory: directory ?? '/' })
         .getOne();
 
       if (!existingFolder) {
@@ -187,7 +178,7 @@ export class UploadService {
     }
 
     // 새로운 폴더 이름을 반환
-    return { folderName: newFolderName, userId, parent };
+    return { folderName: newFolderName, userId };
   }
 
   // async validatorFolder(
@@ -209,17 +200,15 @@ export class UploadService {
   // }
 
   async validatorFolders(
-    { folderNames, userId, parent }: 
+    { folderNames, userId }: 
     { folderNames: string[], 
       userId: number ,
-      parent?: string
     }
   ): Promise<Folders[]>{
     const validatorFolders = await this.foldersRepository
     .createQueryBuilder()
     .where('folder_name IN (:...names)', { names: folderNames })
     .andWhere('user_id_id = :userId',{ userId: userId })
-    .andWhere('(parent = :parent )', { parent: parent ?? 'root' })
     .getMany();
   
     // 중복된 폴더 이름 처리
@@ -239,8 +228,8 @@ export class UploadService {
     
     const validate = await this.validatorFolder({
       folderName: dto.fileName, 
+      directory: dto.directory,
       userId,
-      parent: dto.parent
     })
 
     console.log(validate, 'validate')
@@ -249,7 +238,7 @@ export class UploadService {
     const folder = this.foldersRepository.create({
       folderName: dto.fileName,
       userId: userId,
-      parent: dto.parent
+      directory: dto.directory,
     })
 
     await this.foldersRepository.save(folder)
@@ -264,22 +253,26 @@ export class UploadService {
     return this.foldersRepository.create(data)
   }
 
-  async renameChildFolders(folders:ModifiedFolder[], parentFolder:ModifiedFolder, newFolderName:string) {
-    const updatedFolders = [];
-  
+  async renameChildFolders(folders: ModifiedFolder[], parentFolder: ModifiedFolder, newFolderName: string) {
     for (const folder of folders) {
-      if (folder.parent == parentFolder.folderName) {
-        // 현재 폴더의 parent가 변경된 폴더와 같은 경우 이름 변경
-        const updatedFolder = { ...folder };
-        updatedFolder.parent = newFolderName;
-        updatedFolders.push(updatedFolder);
-      } 
-      else {
-        updatedFolders.push(folder);
+      if (folder.directory.startsWith(parentFolder.folderName)) {
+        // 디렉토리의 첫 번째 세그먼트가 부모 폴더와 같은 경우 이름 변경
+        folder.directory = folder.directory.replace(parentFolder.folderName, newFolderName);
       }
     }
-  
-    return updatedFolders;
+    return folders;
+  }
+
+  async renameFilesDirectory(files: (ModifiedFile | Files)[], oldFolderName: string, newFolderName: string) {
+    for (const file of files) {
+      const directorySegments = file.directory.split('/');
+      if (directorySegments[0] == oldFolderName) {
+        directorySegments[0] = newFolderName;
+        file.directory = directorySegments.join('/');
+      }
+    }
+
+    return files
   }
 
 }

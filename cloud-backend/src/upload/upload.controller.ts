@@ -79,7 +79,6 @@ export class UploadController {
       lastModified: string | string[], 
       lastModifiedDate: string | string[],
     },
-    @Body('parent', UndefinedPipe) parent: string | undefined
   ) {
     // console.log('arrive',parent, typeof parent )
     
@@ -101,9 +100,8 @@ export class UploadController {
       })
     })
 
-    await this.uploadService.createPathFiles(newFileArray, parent )
+    await this.uploadService.createPathFiles(newFileArray )
     
-    console.log(pathFiles)
   }
 
   @Post('create/folder')
