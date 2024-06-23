@@ -5,7 +5,9 @@
     <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
   </template>
 
-  <v-app-bar-title>MY CLOUD</v-app-bar-title>
+  <v-app-bar-title 
+    style="cursor: pointer;" @click="router.push('/main')"
+  >MY CLOUD</v-app-bar-title>
 
   <v-spacer></v-spacer>
 
@@ -106,6 +108,9 @@ height="140" elevation="0" >
 import { ref } from 'vue'
 import FileTopbar from '@/components/FileTopbar.vue';
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 
 const drawer = ref()
 const spareCapacity = ref(30)

@@ -49,15 +49,36 @@ export class UserDataService {
 //   categories: true,
 // },
   async folderInnerData(userId: number, folderDataDto: FolderDataDto) {
-    const result = await this.foldersRepository
-      .createQueryBuilder('folder')
-      .leftJoinAndSelect('folder.file', 'file')
-      .where('folder.userId = :userId', { userId })
-      .andWhere('folder.folderName = :folderName', { folderName: folderDataDto.folder })
-      .orWhere('folder.directory = :directory', { directory: folderDataDto.directory }) 
-      .getMany();
+    // const result = await this.foldersRepository
+    //   .createQueryBuilder('folder')
+    //   .leftJoinAndSelect('folder.file', 'file')
+    //   .where('folder.userId = :userId', { userId })
+    //   .andWhere('folder.folderName = :folderName', { folderName: folderDataDto.folderName })
+    //   .orWhere('folder.directory = :directory', { directory: folderDataDto.directory }) 
+    //   .getMany();
+    const directory = folderDataDto.directory;
+    const folderName = folderDataDto.folderName
+    const result = await this.userRepository
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.files', 'files', 'files.directory = :directory', { directory })
+    .leftJoinAndSelect('user.folders', 'folders', 'folders.directory = :directory', { directory })
+    .select([
+      'user.id',
+      'files.id',
+      'files.fileName',
+      'files.fileType',
+      'files.size',
+      'files.file',
+      'files.lastModified',
+      'files.lastModifiedDate',
+      'folders.id',
+      'folders.directory',
+      'folders.folderName',
+    ])
+    .where('user.id = :userId', { userId })
+    .getOne();
 
-    console.log(result, 'what inner folder data?');
+    // console.log(result, 'what inner folder data?');
     return result;
   }
 

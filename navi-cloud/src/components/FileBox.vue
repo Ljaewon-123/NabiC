@@ -27,12 +27,12 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn
+      <!-- <v-btn
         color="blue-darken-4"
         v-model="star"
         @click="star = !star"
         :icon="star ? 'mdi-star' : 'mdi-star-outline' "
-      ></v-btn>
+      ></v-btn> -->
     </template>
     
   </v-card>

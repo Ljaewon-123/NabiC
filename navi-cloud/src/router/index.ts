@@ -49,7 +49,7 @@ const router = createRouter({
           component: () => import('@/views/files/RootView.vue')
         },
         { 
-          path: '/main/path/:folder/dp/:directory', 
+          path: '/main/path/:folderName/dp/:directory', 
           name: 'Path',
           component: () => import('@/views/files/FolderContents.vue') 
         },

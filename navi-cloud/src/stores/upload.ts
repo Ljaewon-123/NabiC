@@ -1,7 +1,8 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { useFileDialog } from '@vueuse/core'
 import { upload } from '@/boots/AxiosInstance'
 import { useRoute } from 'vue-router'
+import { useReloadStore } from './reload'
 
 interface Files extends File {
   lastModifiedDate: Date
@@ -9,6 +10,10 @@ interface Files extends File {
 
 // 이미 있는이름같은데 
 export const useUpload = defineStore('upload', () => {
+
+  const reloadStore = useReloadStore()
+  const { trigger, reloadReq } = useReloadStore()
+  const { reload } = storeToRefs(reloadStore)
 
   const route = useRoute()
 
@@ -39,6 +44,8 @@ export const useUpload = defineStore('upload', () => {
   
     console.log(files, typeof files)
     await upload.post('files', formData)
+
+    trigger()
   
     reset()
   })
@@ -65,6 +72,8 @@ export const useUpload = defineStore('upload', () => {
     formData.append('parentName', route.params.folder as string );
     
     await upload.post('folder', formData)
+
+    trigger()
     
     folderReset()
   })

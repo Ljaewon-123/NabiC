@@ -30,7 +30,13 @@ import type { Buffer } from 'buffer';
 import { ref, onMounted, computed, watchEffect } from 'vue'
 import type { Folder, UserFile } from '@/types/FileBox';
 import { useRoute, useRouter } from 'vue-router';
+import { useReloadStore } from '@/stores/reload';
+import { storeToRefs } from 'pinia';
 // import { pushRouter } from '@/utils';
+
+const reloadStore = useReloadStore()
+const { trigger, reloadReq } = useReloadStore()
+const { reload } = storeToRefs(reloadStore)
 
 const router = useRouter()
 const route = useRoute()
@@ -38,7 +44,7 @@ const pushRouter = (folderName: string) => {
   router.push({ 
     name: 'Path', 
     params: { 
-      folder: folderName, 
+      folderName: folderName, 
       directory: folderName
     } 
   })
@@ -46,13 +52,17 @@ const pushRouter = (folderName: string) => {
 }
 const files = ref<UserFile[]>([])
 const folders = ref<Folder[]>([])
+const getUserData = async() => {
+  const getUserData = await naviapi.get('user-data')
+  const data = getUserData.data
+  console.log(data)
+  files.value = data.files
+  folders.value = data.folders
+}
+getUserData()
 
-const getUserData = await naviapi.get('user-data')
-const data = getUserData.data
-console.log(data)
-files.value = data.files
-folders.value = data.folders
 
+reloadReq(getUserData)
 
 
 </script>

@@ -13,9 +13,7 @@ export class UserDataController {
   getFiles(@GetCurrentUserId() userId: number,){
     return this.userDataService.rootData(userId)
   }
-
-  // depth가 숫자로 들어와야 되는건 맞는데 
-  // 실제로는 문자열이고 검증도 필요하고 pipe변환도 필요한데 흠;
+  
   @Post()
   getFolderData(
     @GetCurrentUserId() userId: number,
