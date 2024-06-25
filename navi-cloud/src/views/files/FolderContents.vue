@@ -11,8 +11,8 @@
     <file-box
       v-for="folder in folders"
       :key="folder.id"
-      @click="pushRouter(folder.folderName)"
       :item-folder="folder"
+      is-folder
     ></file-box>
 
     <file-box

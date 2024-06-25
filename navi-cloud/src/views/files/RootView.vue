@@ -8,14 +8,16 @@
       <file-box
         v-for="folder in folders"
         :key="folder.id"
-        @click="pushRouter(folder.folderName)"
+        v-model:check="fileChecks"
         :item-folder="folder"
+        is-folder
       ></file-box>
 
       <file-box
         v-for="file in files"
         :key="file.id"
         :item="file"
+        v-model:check="fileChecks"
         :item-type="file.fileType"
       ></file-box>
 
@@ -27,7 +29,7 @@
 <script lang="ts" setup>
 import { naviapi } from '@/boots/AxiosInstance';
 import type { Buffer } from 'buffer';
-import { ref, onMounted, computed, watchEffect } from 'vue'
+import { ref, onMounted, computed, watchEffect, watch } from 'vue'
 import type { Folder, UserFile } from '@/types/FileBox';
 import { useRoute, useRouter } from 'vue-router';
 import { useReloadStore } from '@/stores/reload';
@@ -52,6 +54,12 @@ const pushRouter = (folderName: string) => {
 }
 const files = ref<UserFile[]>([])
 const folders = ref<Folder[]>([])
+
+const fileChecks = ref<any[]>([])
+// watch(fileChecks,() => {
+//   console.log(fileChecks.value)
+// })
+
 const getUserData = async() => {
   const getUserData = await naviapi.get('user-data')
   const data = getUserData.data

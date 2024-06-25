@@ -4,9 +4,9 @@
   <v-card
     v-ripple
     class="files pa-auto"
-    @click="clickBox(props.item?.file.data, props.item?.fileType)"
+    @click="clickBox(props.item?.file.data, props.item?.fileType, props.itemFolder?.folderName ,checkBoxHover)"
     :image="
-      !props.itemType ? FOLDER_IMAGE : fileRender(props.item?.file.data, props.item?.fileType)
+      props.isFolder ? FOLDER_IMAGE : fileRender(props.item?.file.data, props.item?.fileType)
     "
     width="150"
     height="150"
@@ -14,15 +14,21 @@
     @mouseleave="mouseover = false"
     style="cursor: pointer;"
   >
-    <template #image v-if="isFolder">
+    <template #image v-if="fileType">
       <v-icon class="etc-icon" size="75">mdi-dots-horizontal-circle</v-icon>
     </template>
-    <template v-if="mouseover" #actions>
+    <template v-if="selected" #actions>
 
       <v-checkbox
         v-model="fileCheck"
         color="blue-darken-4"
         hide-details
+        @mouseover="checkBoxHover = true"
+        @mouseleave="checkBoxHover = false"
+        :value="itemType(
+          { name: props.item?.fileName, type: props.itemType }  , 
+          { name: props.itemFolder?.folderName, type: props.itemType }
+        )"
       ></v-checkbox>  
 
       <v-spacer></v-spacer>
@@ -58,17 +64,67 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 import type { Buffer } from 'buffer';
 import type { PropType } from 'vue'
 import type { UserFile, Folder } from '@/types/FileBox';
 import { formatBytes } from '@/utils'
 import { useEasyLightbox } from 'vue-easy-lightbox';
+import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useSelectedFileStore } from '@/stores/selectedFile';
 
+interface CheckType{
+  name: string
+  type: string
+}
 const props = defineProps({
   item: Object as PropType<UserFile>,
   itemFolder: Object as PropType<Folder>,
-  itemType: String  // undefined이면 폴더 
+  itemType: String,  // undefined이면 폴더  # 명시적으로 하나더 만들까? 
+  isFolder: Boolean,
+})
+
+const mouseover = ref(false)
+const star = ref(false)
+const checkBoxHover = ref(false)
+
+const fileType = computed(() => {
+  if(!props.itemType) return false
+  if(props.itemType?.startsWith('image')) return false
+
+  return true
+})
+
+const FOLDER_IMAGE = '/assets/images/svgs/folder-fill.svg'
+
+
+const selectedFiles = useSelectedFileStore()
+const { allFileChecks } = storeToRefs(selectedFiles)
+
+
+const router = useRouter()
+const route = useRoute()
+
+const fileCheck = defineModel<CheckType[]>('check', { default: [] })
+
+// watch(() => fileCheck.value , () => {
+//   console.log(fileCheck.value ,'?여기 맞어?')
+// })
+
+const selected = computed(() => {
+  if(!fileCheck.value) return mouseover.value
+  // mouseover.value : fileCheck.value
+  const itemObj = typeOption(
+    { name: props.item?.fileName, type: props.itemType }  , 
+    { name: props.itemFolder?.folderName, type: props.itemType }
+  )
+  const hoverItemVisable = fileCheck.value.some( check => {
+    if(check.name == itemObj.name  && check.type == itemObj.type) return true
+  })
+
+  // console.log('?', hoverItemVisable)
+  return hoverItemVisable ? true : mouseover.value
 })
 
 const {
@@ -80,17 +136,39 @@ const {
   initIndex: 0
 })
 
-const isFolder = computed(() => {
-  if(!props.itemType) return false
-  if(props.itemType?.startsWith('image')) return false
+const itemType = (fileAction:any, folderAction: any) => {
+  if(props.item) return fileAction
 
-  return true
-})
+  return folderAction
+}
 
-const FOLDER_IMAGE = '/assets/images/svgs/folder-fill.svg'
+const pushRouter = (folderName?: string) => {
+  // alert(folderName)
+  if(!folderName) return 
+  router.push({ 
+    name: 'Path', 
+    params: { 
+      folderName: folderName, 
+      directory: rootDivision(route.params.directory as string, folderName)
+    } 
+  })
+
+}
+
+function rootDivision(directory: any, folderName:any){
+  if(!directory) return folderName
+
+  return `${directory}/${folderName}`
+}
+/** 파일 vs 폴더 옵션 */
+function typeOption(fileItem: {name?:string, type?: string}, folderItem: {name?:string, type?: string}){
+  if(!props.isFolder) return fileItem
+  return folderItem
+}
+
 
 const fileRender = (buffer: Buffer, type?: string) => {
-  if(isFolder.value) return 
+  if(fileType.value) return 
   if(!type) return  // why??/ undefined안해주고싶은데 
   // 이미지 , 문서 , 오디오만 보여주면됨 
   if(type.startsWith('image')){
@@ -102,8 +180,11 @@ const fileRender = (buffer: Buffer, type?: string) => {
 
   return 
 }
-const clickBox = (buffer: Buffer, type?: string) => {
-  if(!type) return
+
+// click로 구분하는 방법 간단하게 hover변수로 구분하는 방법 후자로 해봄 
+const clickBox = (buffer: Buffer, type?: string, folderName?:string, checkBoxHover?:boolean) => {
+  if(checkBoxHover) return 
+  if(!type) return pushRouter(folderName)
   if(type.startsWith('image')){
     visibleRef.value = true
     imgsRef.value = bufferToBase64(buffer)
@@ -114,11 +195,6 @@ const bufferToBase64 = (buffer: Buffer) => {
   const blob = new Blob([new Uint8Array(buffer)]);
   return URL.createObjectURL(blob);
 }
-
-
-const star = ref(false)
-const fileCheck = ref(false)
-const mouseover = ref(false)
 
 
 </script>
