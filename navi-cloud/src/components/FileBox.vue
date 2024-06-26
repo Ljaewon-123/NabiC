@@ -72,7 +72,7 @@ import { formatBytes } from '@/utils'
 import { useEasyLightbox } from 'vue-easy-lightbox';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import { useSelectedFileStore } from '@/stores/selectedFile';
+import { useFileToolbarStore } from '@/stores/fileToolbar';
 
 interface CheckType{
   name: string
@@ -99,7 +99,7 @@ const fileType = computed(() => {
 const FOLDER_IMAGE = '/assets/images/svgs/folder-fill.svg'
 
 
-const selectedFiles = useSelectedFileStore()
+const selectedFiles = useFileToolbarStore()
 const { allFileChecks } = storeToRefs(selectedFiles)
 
 

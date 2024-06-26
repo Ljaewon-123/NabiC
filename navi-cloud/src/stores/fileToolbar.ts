@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useSelectedFileStore = defineStore('selectedFile', () => {
+export const useFileToolbarStore = defineStore('fileToolbar', () => {
   const allFileChecks = ref<boolean[]>([])
 
 
