@@ -17,6 +17,7 @@
           <v-checkbox
             hide-details
             v-model="allCheck"
+            @change="toggleAll"
           ></v-checkbox>  
           <v-menu>
             <template v-slot:activator="{ props }">
@@ -132,6 +133,7 @@ import { naviapi, upload } from '@/boots/AxiosInstance';
 import { useUpload } from '@/stores/upload';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
+import { useFileToolbarStore } from '@/stores/fileToolbar';
 
 const route = useRoute()
 
@@ -145,7 +147,8 @@ const uploadStore = useUpload()
 // 전역으로 files가 유지되면.. 단점.. 안바뀔지도?? reset으로 해결??
 // 현재 파일들 어디서나 가져올수있는건 괜찮음 
 const { files } = storeToRefs(uploadStore)
-
+const selectedFiles = useFileToolbarStore()
+const { allFileItemLen, fileCheckList, allFileItems } = storeToRefs(selectedFiles)
 const allCheck = ref<boolean>(false)
 const toggleBtn = ref()
 const newFolder = ref<boolean>(false)
@@ -169,6 +172,23 @@ const requiredArr = [
 
 watch(newFolder, () => {
   newFolderName.value = ''
+})
+
+const toggleAll = () => {
+  if(!allFileItemLen.value) return
+  if(!allCheck.value) return fileCheckList.value = []
+  
+  // 가장 베스트는 없는거만 넣어주는건데...
+  fileCheckList.value = []
+  allFileItems.value.forEach( file => fileCheckList.value.push(file) )
+  
+}
+
+
+watch(() => (fileCheckList.value), () => {
+  if(fileCheckList.value.length == allFileItemLen.value) return allCheck.value = true
+
+  allCheck.value = false
 })
 
 

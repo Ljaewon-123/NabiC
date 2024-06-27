@@ -69,24 +69,7 @@
   </v-list>
 
   <template #append>
-    <v-card class="pa-4" height="70" elevation="0" border="md">
-      <div class="d-flex align-center justify-space-between">
-        <div class="d-flex gap-8">
-          <strong>currnet</strong>
-          <strong>/</strong>
-          <strong>res</strong>
-        </div>
-        <div>여유 {{ 'test' }}</div>
-      </div>
-      <div>
-        <v-progress-linear
-        v-model="spareCapacity"
-        color="blue-darken-3"
-        height="5"
-        rounded
-      ></v-progress-linear>
-      </div>
-    </v-card>
+    <free-space></free-space>
   </template>
 
 </v-navigation-drawer>
@@ -109,11 +92,12 @@ import { ref } from 'vue'
 import FileTopbar from '@/components/FileTopbar.vue';
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import { useRouter } from 'vue-router';
+import FreeSpace from '@/components/FreeSpace.vue'
 
 const router = useRouter()
 
 const drawer = ref()
-const spareCapacity = ref(30)
+
 
 const links = [
   { type: 'mngt' ,

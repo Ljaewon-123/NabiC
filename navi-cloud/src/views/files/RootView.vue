@@ -8,7 +8,6 @@
       <file-box
         v-for="folder in folders"
         :key="folder.id"
-        v-model:check="fileChecks"
         :item-folder="folder"
         is-folder
       ></file-box>
@@ -17,7 +16,6 @@
         v-for="file in files"
         :key="file.id"
         :item="file"
-        v-model:check="fileChecks"
         :item-type="file.fileType"
       ></file-box>
 
@@ -34,11 +32,14 @@ import type { Folder, UserFile } from '@/types/FileBox';
 import { useRoute, useRouter } from 'vue-router';
 import { useReloadStore } from '@/stores/reload';
 import { storeToRefs } from 'pinia';
+import { useFileToolbarStore } from '@/stores/fileToolbar';
 // import { pushRouter } from '@/utils';
 
 const reloadStore = useReloadStore()
 const { trigger, reloadReq } = useReloadStore()
 const { reload } = storeToRefs(reloadStore)
+const selectedFiles = useFileToolbarStore()
+const { allFileItemLen, fileCheckList } = storeToRefs(selectedFiles)
 
 const router = useRouter()
 const route = useRoute()
@@ -50,12 +51,11 @@ const pushRouter = (folderName: string) => {
       directory: folderName
     } 
   })
-
 }
 const files = ref<UserFile[]>([])
 const folders = ref<Folder[]>([])
 
-const fileChecks = ref<any[]>([])
+// const fileChecks = ref<any[]>([])
 // watch(fileChecks,() => {
 //   console.log(fileChecks.value)
 // })
@@ -66,11 +66,23 @@ const getUserData = async() => {
   console.log(data)
   files.value = data.files
   folders.value = data.folders
+
+  allFileItemLen.value = data.files.length + data.folders.length
+  
 }
-getUserData()
+// getUserData()
 
 
-reloadReq(getUserData)
+watch( reload , async() => {
+  await Promise.allSettled([
+    getUserData().catch(console.log),
+    // Promise.reject('123').catch(console.log)
+  ])
+}, { immediate:true })
+// reloadReq([
+//   () => getUserData().catch(console.log),
+//   () => Promise.reject('123').catch(console.log)
+// ])
 
 
 </script>

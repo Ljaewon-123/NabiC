@@ -20,14 +20,26 @@
     <template v-if="selected" #actions>
 
       <v-checkbox
-        v-model="fileCheck"
+        v-model="fileCheckList"
         color="blue-darken-4"
         hide-details
         @mouseover="checkBoxHover = true"
         @mouseleave="checkBoxHover = false"
         :value="itemType(
-          { name: props.item?.fileName, type: props.itemType }  , 
-          { name: props.itemFolder?.folderName, type: props.itemType }
+          { 
+            id: props.item?.id,
+            name: props.item?.fileName, 
+            type: props.itemType,
+            isFolder: props.isFolder,
+            data: ''
+          }  , 
+          { 
+            id: props.itemFolder?.id,
+            name: props.itemFolder?.folderName, 
+            type: props.itemType,
+            isFolder: props.isFolder,
+            data: ''
+          }
         )"
       ></v-checkbox>  
 
@@ -64,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRef, watch } from 'vue'
+import { computed, ref, toRef, watch, onUpdated } from 'vue'
 import type { Buffer } from 'buffer';
 import type { PropType } from 'vue'
 import type { UserFile, Folder } from '@/types/FileBox';
@@ -85,6 +97,18 @@ const props = defineProps({
   isFolder: Boolean,
 })
 
+// 여기서는 pinia로 해야 성능이 훨씬더 좋아짐 model을 사용하면 
+// 한번 체크박스 클릭당 전부 업데이트 그리고 model이 배열이고 복잡한 객체라서 
+// 이를 구분하기가 어려움 :active="item.id === activeId"이런식으로는 못해줌 
+// const fileCheck = defineModel<CheckType[]>('check', { default: [] })
+
+const router = useRouter()
+const route = useRoute()
+const selectedFiles = useFileToolbarStore()
+const { checkItemPush } = useFileToolbarStore()
+const { fileCheckList, allFileItems } = storeToRefs(selectedFiles)
+
+
 const mouseover = ref(false)
 const star = ref(false)
 const checkBoxHover = ref(false)
@@ -98,28 +122,21 @@ const fileType = computed(() => {
 
 const FOLDER_IMAGE = '/assets/images/svgs/folder-fill.svg'
 
-
-const selectedFiles = useFileToolbarStore()
-const { allFileChecks } = storeToRefs(selectedFiles)
-
-
-const router = useRouter()
-const route = useRoute()
-
-const fileCheck = defineModel<CheckType[]>('check', { default: [] })
-
 // watch(() => fileCheck.value , () => {
 //   console.log(fileCheck.value ,'?여기 맞어?')
 // })
+// onUpdated(() => {
+//   console.log('update??')
+// })
 
 const selected = computed(() => {
-  if(!fileCheck.value) return mouseover.value
+  if(!fileCheckList.value) return mouseover.value
   // mouseover.value : fileCheck.value
   const itemObj = typeOption(
     { name: props.item?.fileName, type: props.itemType }  , 
     { name: props.itemFolder?.folderName, type: props.itemType }
   )
-  const hoverItemVisable = fileCheck.value.some( check => {
+  const hoverItemVisable = fileCheckList.value.some( check => {
     if(check.name == itemObj.name  && check.type == itemObj.type) return true
   })
 
@@ -196,6 +213,25 @@ const bufferToBase64 = (buffer: Buffer) => {
   return URL.createObjectURL(blob);
 }
 
+// 좋지않음....
+checkItemPush(
+  itemType(
+    { 
+      id: props.item?.id,
+      name: props.item?.fileName, 
+      type: props.itemType,
+      isFolder: props.isFolder,
+      data: ''
+    }  , 
+    { 
+      id: props.itemFolder?.id,
+      name: props.itemFolder?.folderName, 
+      type: props.itemType,
+      isFolder: props.isFolder,
+      data: ''
+    }
+  )
+)
 
 </script>
 

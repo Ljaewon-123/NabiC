@@ -34,10 +34,13 @@ import { useRoute, useRouter } from 'vue-router';
 import type { Folder, UserFile } from '@/types/FileBox';
 import { useReloadStore } from '@/stores/reload';
 import { storeToRefs } from 'pinia';
+import { useFileToolbarStore } from '@/stores/fileToolbar';
 
 const reloadStore = useReloadStore()
 const { trigger, reloadReq } = useReloadStore()
-
+const { reload } = storeToRefs(reloadStore)
+const selectedFiles = useFileToolbarStore()
+const { allFileItemLen } = storeToRefs(selectedFiles)
 const router = useRouter()
 const route = useRoute()
 const pushRouter = (folderName: string) => {
@@ -62,12 +65,23 @@ const getUserData = async() => {
 
   files.value = data.files
   folders.value = data.folders
+
+  allFileItemLen.value = data.files.length + data.folders.length
 }
-getUserData()
+// getUserData()
 
 watch(() => route.params, () =>{
   getUserData()
 })
-reloadReq(getUserData)
+
+watch( reload , async() => {
+  await Promise.allSettled([
+    getUserData().catch(console.log),
+    Promise.reject('123').catch(console.log)
+  ])
+}, { immediate:true })
+// reloadReq([
+//   getUserData().catch(console.log),
+// ])
 
 </script>

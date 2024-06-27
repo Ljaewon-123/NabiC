@@ -8,9 +8,11 @@ export const useReloadStore = defineStore('reload', () => {
     reload.value = !reload.value
   }
 
-  const reloadReq = (...methods: Function[]) => {
-    watch( reload , () => {
-      methods.forEach( func => func())
+  // 아직좀 불안정하네 .....
+  const reloadReq = (methods: Function[]) => {
+    watch( reload , async() => {
+      // methods.forEach( func => func())
+      await Promise.allSettled(methods)
     })
   }
 
