@@ -2,7 +2,7 @@
 <v-container fluid class="h-100" >
 
 <v-row class="mt-2">
-  <v-col class="d-flex ga-3">
+  <v-col class="d-flex ga-3 flex-wrap">
 
     <!-- {{ route.params.folderName }}
     //
@@ -40,7 +40,8 @@ const reloadStore = useReloadStore()
 const { trigger, reloadReq } = useReloadStore()
 const { reload } = storeToRefs(reloadStore)
 const selectedFiles = useFileToolbarStore()
-const { allFileItemLen } = storeToRefs(selectedFiles)
+const { clearCurrentItems } = useFileToolbarStore()
+const { allFileItemLen, allFileItems } = storeToRefs(selectedFiles)
 const router = useRouter()
 const route = useRoute()
 const pushRouter = (folderName: string) => {
@@ -61,24 +62,27 @@ const getUserData = async() => {
   const result = await naviapi.post('user-data', route.params)
   // { "folder": "haha", "depth": "1" }
   console.table(result.data)
+  allFileItems.value = []
   const data = result.data
-
+  clearCurrentItems()
   files.value = data.files
   folders.value = data.folders
 
   allFileItemLen.value = data.files.length + data.folders.length
+  
+  return result
 }
 // getUserData()
 
 watch(() => route.params, () =>{
-  getUserData()
+  getUserData().catch(console.log)
 })
 
 watch( reload , async() => {
   await Promise.allSettled([
-    getUserData().catch(console.log),
-    Promise.reject('123').catch(console.log)
-  ])
+    getUserData(),
+    Promise.reject('123')
+  ]).then(console.log)
 }, { immediate:true })
 // reloadReq([
 //   getUserData().catch(console.log),

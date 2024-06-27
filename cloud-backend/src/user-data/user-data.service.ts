@@ -4,7 +4,7 @@ import { CloudUser } from 'src/auth/entity';
 import { Files } from 'src/upload/entity/files.entity';
 import { Folders } from 'src/upload/entity/folders.entity';
 import { Repository } from 'typeorm';
-import { FolderDataDto } from './dto';
+import { DeleteFilesDto, FolderDataDto } from './dto';
 
 @Injectable()
 export class UserDataService {
@@ -80,6 +80,23 @@ export class UserDataService {
 
     // console.log(result, 'what inner folder data?');
     return result;
+  }
+
+  async deleteUserFiles(userId:number, deleteFilesDto:DeleteFilesDto){
+    deleteFilesDto.itemList.forEach( async item => {
+      if(!item.isFolder) return await this.filesRepository.delete({ userId:userId, id: item.id })
+
+      await Promise.all([
+        this.foldersRepository.delete({ userId:userId, id: item.id }),
+        this.filesRepository.delete({ userId:userId, directory: item.name })
+      ])
+      .catch((error) => {
+        console.error(error);
+      })
+      
+    })
+    // console.log(deleteFilesDto)
+    
   }
 
 }

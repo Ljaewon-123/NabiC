@@ -2,8 +2,8 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useFileToolbarStore = defineStore('fileToolbar', () => {
-  const fileCheckList = ref<any[]>([]) 
-  const allFileItemLen = ref<number>(0)
+  const fileCheckList = ref<any[]>([])  // 현재 체크된 파일들
+  const allFileItemLen = ref<number>(0) // allFileItems이 filebox에서 추가되기때문데 이 변수는 가지고있어야한다.
 
   const allFileItems = ref<any[]>([])
 
@@ -11,9 +11,13 @@ export const useFileToolbarStore = defineStore('fileToolbar', () => {
   function checkItemPush(item:any){
     allFileItems.value.push(item)
   }
+  function clearCurrentItems(){
+    allFileItems.value = []
+  }
 
   return {
     checkItemPush,
+    clearCurrentItems,
     fileCheckList,
     allFileItemLen,
     allFileItems,

@@ -42,9 +42,26 @@
             </v-list>
           </v-menu>
 
-          <v-btn @click="newFolder = true" class="text-none" variant="tonal">
+          <v-btn v-if="!hasSelectedFiles"
+            @click="newFolder = true" 
+            class="text-none" 
+            variant="tonal"
+          >
             New Folder
           </v-btn>
+
+          <div v-if="hasSelectedFiles"
+          class="d-flex gap-8 align-center"
+          >
+            <span >|</span>
+            <v-btn
+              @click="deleteFiles"
+              class="text-none" 
+              variant="tonal"
+            >
+              Delete
+            </v-btn>
+          </div>
 
 
           <template v-if="files">
@@ -127,13 +144,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, watchEffect, type Ref } from 'vue';
+import { computed, ref, watch, watchEffect, type Ref } from 'vue';
 import { useFileDialog } from '@vueuse/core'
 import { naviapi, upload } from '@/boots/AxiosInstance';
 import { useUpload } from '@/stores/upload';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { useFileToolbarStore } from '@/stores/fileToolbar';
+import { useReloadStore } from '@/stores/reload';
 
 const route = useRoute()
 
@@ -144,6 +162,7 @@ const {
   open,
 } = useUpload()
 const uploadStore = useUpload()
+const { trigger } = useReloadStore()
 // 전역으로 files가 유지되면.. 단점.. 안바뀔지도?? reset으로 해결??
 // 현재 파일들 어디서나 가져올수있는건 괜찮음 
 const { files } = storeToRefs(uploadStore)
@@ -170,9 +189,22 @@ const requiredArr = [
   (v: string) => /^[^\\\\/:*?"<>|]+$/.test(v) || "Don't use symbol",
 ]
 
+const deleteFiles = async() => {
+  await naviapi.delete('user-data', {
+    data: {
+      itemList: fileCheckList.value,
+      directory: route.params.folderName ?? '/'
+    }
+  })
+
+  trigger()
+}
+
 watch(newFolder, () => {
   newFolderName.value = ''
 })
+
+const hasSelectedFiles = computed(() => fileCheckList.value.length != 0 ? true : false )
 
 const toggleAll = () => {
   if(!allFileItemLen.value) return

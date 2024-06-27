@@ -39,7 +39,8 @@ const reloadStore = useReloadStore()
 const { trigger, reloadReq } = useReloadStore()
 const { reload } = storeToRefs(reloadStore)
 const selectedFiles = useFileToolbarStore()
-const { allFileItemLen, fileCheckList } = storeToRefs(selectedFiles)
+const { clearCurrentItems } = useFileToolbarStore()
+const { allFileItemLen, allFileItems } = storeToRefs(selectedFiles)
 
 const router = useRouter()
 const route = useRoute()
@@ -63,21 +64,22 @@ const folders = ref<Folder[]>([])
 const getUserData = async() => {
   const getUserData = await naviapi.get('user-data')
   const data = getUserData.data
+  clearCurrentItems()
   console.log(data)
   files.value = data.files
   folders.value = data.folders
 
   allFileItemLen.value = data.files.length + data.folders.length
-  
+  return getUserData
 }
 // getUserData()
 
 
 watch( reload , async() => {
   await Promise.allSettled([
-    getUserData().catch(console.log),
+    getUserData(),
     // Promise.reject('123').catch(console.log)
-  ])
+  ]).then(console.log)
 }, { immediate:true })
 // reloadReq([
 //   () => getUserData().catch(console.log),

@@ -122,9 +122,6 @@ const fileType = computed(() => {
 
 const FOLDER_IMAGE = '/assets/images/svgs/folder-fill.svg'
 
-// watch(() => fileCheck.value , () => {
-//   console.log(fileCheck.value ,'?여기 맞어?')
-// })
 // onUpdated(() => {
 //   console.log('update??')
 // })
