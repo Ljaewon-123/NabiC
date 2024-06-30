@@ -4,14 +4,11 @@
     class="files pa-auto"
     width="150"
     height="150"
-    style="cursor: pointer;"
     @click="clickBox(props.item?.file.data)"
-    :image="
-      fileRender(props.item?.file.data)
-    "
+    style="cursor: pointer;"
   >
     <template #image>
-      <v-icon class="file-icon" size="75">mdi-video</v-icon>
+      <v-icon color="deep-orange-lighten-1" class="file-icon" size="75">mdi-video</v-icon>
     </template>
     <template #actions>
       <slot ></slot>

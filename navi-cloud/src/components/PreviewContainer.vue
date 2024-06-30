@@ -1,12 +1,10 @@
 <template>
-<div>
-  <component 
-  :is="dynamic" 
-  v-bind="props"
-  >
-    <slot ></slot>
-  </component>
-</div>
+<component 
+:is="dynamic" 
+v-bind="props"
+>
+  <slot ></slot>
+</component>
 </template>
 
 <script setup lang="ts">
