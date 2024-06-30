@@ -1,23 +1,15 @@
 <template>
-<div>
+<div 
+@mouseover="mouseover = true"
+@mouseleave="mouseover = false"
+>
   <!-- '/assets/images/svgs/folder-fill.svg' -->
-  <v-card
-    v-ripple
-    class="files pa-auto"
-    @click="clickBox(props.item?.file.data, props.item?.fileType, props.itemFolder?.folderName ,checkBoxHover)"
-    :image="
-      props.isFolder ? FOLDER_IMAGE : fileRender(props.item?.file.data, props.item?.fileType)
-    "
-    width="150"
-    height="150"
-    @mouseover="mouseover = true"
-    @mouseleave="mouseover = false"
-    style="cursor: pointer;"
+  <preview-container
+    :preview="props.isFolder ? 'folder' : props.itemType?.split('/')[0]"
+    :check-box-hover="checkBoxHover"
+    v-bind="props"
   >
-    <template #image v-if="fileType">
-      <v-icon class="etc-icon" size="75">mdi-dots-horizontal-circle</v-icon>
-    </template>
-    <template v-if="selected" #actions>
+    <template v-if="selected" >
 
       <v-checkbox
         v-model="fileCheckList"
@@ -51,9 +43,10 @@
         @click="star = !star"
         :icon="star ? 'mdi-star' : 'mdi-star-outline' "
       ></v-btn> -->
+      
     </template>
     
-  </v-card>
+  </preview-container>
   <div>
     <slot>
       <div class="text-center wrap-text">
@@ -64,13 +57,6 @@
       </div>
     </slot>
   </div>
-
-  <vue-easy-lightbox
-    :visible="visibleRef"
-    :imgs="imgsRef"
-    :index="indexRef"
-    @hide="onHide"
-  />
 
 </div>
 </template>
@@ -85,6 +71,8 @@ import { useEasyLightbox } from 'vue-easy-lightbox';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useFileToolbarStore } from '@/stores/fileToolbar';
+import PreviewFile from '@/components/PreviewFile.vue'
+import PreviewContainer from './PreviewContainer.vue';
 
 interface CheckType{
   name: string
@@ -108,23 +96,13 @@ const selectedFiles = useFileToolbarStore()
 const { checkItemPush } = useFileToolbarStore()
 const { fileCheckList, allFileItems } = storeToRefs(selectedFiles)
 
+// onUpdated(() => console.log('update!'))
 
 const mouseover = ref(false)
 const star = ref(false)
 const checkBoxHover = ref(false)
 
-const fileType = computed(() => {
-  if(!props.itemType) return false
-  if(props.itemType?.startsWith('image')) return false
 
-  return true
-})
-
-const FOLDER_IMAGE = '/assets/images/svgs/folder-fill.svg'
-
-// onUpdated(() => {
-//   console.log('update??')
-// })
 
 const selected = computed(() => {
   if(!fileCheckList.value) return mouseover.value
@@ -141,14 +119,6 @@ const selected = computed(() => {
   return hoverItemVisable ? true : mouseover.value
 })
 
-const {
-  show, onHide, changeIndex,
-  visibleRef, indexRef, imgsRef
-} = useEasyLightbox({
-  // src / src[]
-  imgs: [],
-  initIndex: 0
-})
 
 const itemType = (fileAction:any, folderAction: any) => {
   if(props.item) return fileAction
@@ -156,24 +126,6 @@ const itemType = (fileAction:any, folderAction: any) => {
   return folderAction
 }
 
-const pushRouter = (folderName?: string) => {
-  // alert(folderName)
-  if(!folderName) return 
-  router.push({ 
-    name: 'Path', 
-    params: { 
-      folderName: folderName, 
-      directory: rootDivision(route.params.directory as string, folderName)
-    } 
-  })
-
-}
-
-function rootDivision(directory: any, folderName:any){
-  if(!directory) return folderName
-
-  return `${directory}/${folderName}`
-}
 /** 파일 vs 폴더 옵션 */
 function typeOption(fileItem: {name?:string, type?: string}, folderItem: {name?:string, type?: string}){
   if(!props.isFolder) return fileItem
@@ -181,34 +133,7 @@ function typeOption(fileItem: {name?:string, type?: string}, folderItem: {name?:
 }
 
 
-const fileRender = (buffer: Buffer, type?: string) => {
-  if(fileType.value) return 
-  if(!type) return  // why??/ undefined안해주고싶은데 
-  // 이미지 , 문서 , 오디오만 보여주면됨 
-  if(type.startsWith('image')){
-    // const blob = new Blob([new Uint8Array(buffer)]);
-    // const imageUrl = URL.createObjectURL(blob);
-    const imageUrl = bufferToBase64(buffer)
-    return imageUrl
-  }
 
-  return 
-}
-
-// click로 구분하는 방법 간단하게 hover변수로 구분하는 방법 후자로 해봄 
-const clickBox = (buffer: Buffer, type?: string, folderName?:string, checkBoxHover?:boolean) => {
-  if(checkBoxHover) return 
-  if(!type) return pushRouter(folderName)
-  if(type.startsWith('image')){
-    visibleRef.value = true
-    imgsRef.value = bufferToBase64(buffer)
-  }
-}
-
-const bufferToBase64 = (buffer: Buffer) => {
-  const blob = new Blob([new Uint8Array(buffer)]);
-  return URL.createObjectURL(blob);
-}
 
 // 좋지않음....
 checkItemPush(
