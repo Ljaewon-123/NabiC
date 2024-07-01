@@ -161,7 +161,16 @@ checkItemPush(
 .wrap-text {
   width: 150px;
   word-wrap: break-word; /* 또는 overflow-wrap: break-word; */
-  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  display: box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
+  /* white-space: normal; */
+  /* white-space: nowrap; */
 }
 </style>
 

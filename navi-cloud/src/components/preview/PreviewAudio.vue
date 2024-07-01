@@ -28,16 +28,13 @@
   </v-btn>
 
   <div class="d-flex justify-center">
-  <div class="container d-flex flex-column align-center">
-    <v-icon :class="{ 'spinner' : isPlay }" icon="md:slow_motion_video" size="600" ></v-icon>
-    <!-- <md-icon :size="600">
-      slow_motion_video
-    </md-icon> -->
-    <figure class="d-flex flex-column align-center">
-      <audio id="audioPlayer" ref="audioPlayer" :src="audioSrc" controls ></audio>
-      <figcaption class="w-50 ">{{ props.item?.fileName }}</figcaption>
-    </figure>
-  </div>
+    <div class="container d-flex flex-column align-center">
+      <v-icon :class="{ 'spinner' : isPlay }" icon="md:slow_motion_video" size="600" ></v-icon>
+      <figure class="d-flex flex-column align-center">
+        <audio id="audioPlayer" ref="audioPlayer" :src="audioSrc" controls ></audio>
+        <figcaption class="w-50 ">{{ props.item?.fileName }}</figcaption>
+      </figure>
+    </div>
   </div>
 
 </v-dialog>
@@ -49,7 +46,6 @@ import { useThemeMode } from '@/stores/theme';
 import type { Folder, UserFile } from '@/types/FileBox';
 import type { Buffer } from 'buffer';
 import { computed, onMounted, ref, watch, type PropType } from 'vue'
-import { useEasyLightbox } from 'vue-easy-lightbox';
 
 const props = defineProps({
   preview: String,

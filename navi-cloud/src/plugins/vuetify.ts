@@ -1,9 +1,7 @@
 import 'vuetify/styles'
-import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import { createVuetify, type IconOptions, type ThemeDefinition } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import '@mdi/font/css/materialdesignicons.css'
 
 import { mdi } from 'vuetify/iconsets/mdi'
 import { aliases, fa } from 'vuetify/iconsets/fa'
@@ -14,6 +12,13 @@ import { computed } from 'vue'
 
 import '@/styles/variables.scss'
 
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import '@mdi/font/css/materialdesignicons.css'
+
+// import('@mdi/font/css/materialdesignicons.css')
+// .catch(error => {
+//   console.error('CSS 파일 로드 중 오류가 발생했습니다:', error);
+// });
 
 const isDark = useDark({
   selector: 'body',

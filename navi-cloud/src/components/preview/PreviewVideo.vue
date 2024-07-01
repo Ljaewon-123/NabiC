@@ -16,13 +16,37 @@
   </v-card>
   
 
+<v-dialog
+  v-model="dialog"
+  fullscreen
+>
+  <v-btn
+    color="#00000000"
+    elevation="0"
+    icon="mdi-close"
+    @click="dialog = false"
+  >
+    <v-icon color="primary">mdi-close</v-icon>
+  </v-btn>
+
+  <div class="video-container" >
+    <video controls width="100%" :height="height / 8" playsinline >
+      <!-- <source :src="/media/cc0-videos/flower.webm" type="video/webm" /> -->
+      <!-- <source :src="videoSrc" type="video/webm" /> -->
+      <source :src="videoSrc"  type="video/mp4" />
+
+    </video>
+  </div>
+
+</v-dialog>
+
 </template>
 
 <script setup lang="ts">
 import type { Folder, UserFile } from '@/types/FileBox';
 import type { Buffer } from 'buffer';
 import { computed, ref, type PropType } from 'vue'
-import { useEasyLightbox } from 'vue-easy-lightbox';
+import { useDisplay } from 'vuetify';
 
 const props = defineProps({
   preview: String,
@@ -33,30 +57,43 @@ const props = defineProps({
   checkBoxHover: Boolean,
 })
 
-
+const dialog = ref(false)
+const videoSrc = ref()
+const { height } = useDisplay()
 
 const clickBox = (buffer: Buffer) => {
-  // visibleRef.value = true
-  // imgsRef.value = bufferToBase64(buffer)
+  dialog.value = true
+  videoSrc.value = playVideo(buffer)
 }
 
-// 이제 이거는 항상 이미지임 
-const fileRender = (buffer: Buffer) => {
 
-  return 'mdi-video'
+const playVideo = (buffer: Buffer) => {
 
-  // else if(type.startsWith('audio')){
-  //   return 'mdi-volume-high'
-  // }
+  const blob = new Blob([new Uint8Array(buffer)]);
+  return URL.createObjectURL(blob)
+
 }
-
 
 
 
 </script>
 
 <style scoped>
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* for aspect ratio 16:9 */
+  overflow: hidden;
+}
 
+.video-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80%;
+  object-fit: cover;
+}
 </style>
 
 <style>
