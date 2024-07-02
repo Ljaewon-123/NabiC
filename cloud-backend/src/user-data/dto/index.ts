@@ -1,2 +1,2 @@
 export * from './folder-data.dto'
-export * from './delete-files.dto'
+export * from './checked-files.dto'

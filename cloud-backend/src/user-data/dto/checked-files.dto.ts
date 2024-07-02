@@ -21,7 +21,7 @@ class FileDto {
   data?: string;
 }
 
-export class DeleteFilesDto {
+export class CheckedFilesDto {
   @IsString()
   directory: string;
 

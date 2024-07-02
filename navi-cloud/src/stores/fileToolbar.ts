@@ -13,6 +13,7 @@ export const useFileToolbarStore = defineStore('fileToolbar', () => {
   }
   function clearCurrentItems(){
     allFileItems.value = []
+    fileCheckList.value = []
   }
 
   return {

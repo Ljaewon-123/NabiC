@@ -3,5 +3,5 @@ interface BoxType{
   name?: string
   type?: string
   isFolder?: boolean
-  data: string
+  data?: string
 }

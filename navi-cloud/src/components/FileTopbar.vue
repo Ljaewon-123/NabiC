@@ -55,6 +55,13 @@
           >
             <span >|</span>
             <v-btn
+              @click="downloadFiles"
+              class="text-none" 
+              variant="tonal"
+            >
+              Download
+            </v-btn>
+            <v-btn
               @click="deleteFiles"
               class="text-none" 
               variant="tonal"
@@ -198,6 +205,15 @@ const deleteFiles = async() => {
   })
 
   trigger()
+}
+
+const downloadFiles = async() => {
+  await naviapi.post('user-data/download',{
+    itemList: fileCheckList.value,
+    directory: route.params.folderName ?? '/'
+  })
+
+  // trigger()
 }
 
 watch(newFolder, () => {

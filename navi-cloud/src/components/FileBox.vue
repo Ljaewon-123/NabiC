@@ -23,14 +23,12 @@
             name: props.item?.fileName, 
             type: props.itemType,
             isFolder: props.isFolder,
-            data: ''
           }  , 
           { 
             id: props.itemFolder?.id,
             name: props.itemFolder?.folderName, 
             type: props.itemType,
             isFolder: props.isFolder,
-            data: ''
           }
         )"
       ></v-checkbox>  
