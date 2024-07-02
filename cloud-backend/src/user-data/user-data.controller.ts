@@ -29,7 +29,7 @@ export class UserDataController {
     @Body()deleteFilesDto: DeleteFilesDto,
   ){
     console.log(userId)
-    console.log(deleteFilesDto,' 옵셔널이라 그랬어~')
+    // console.log(deleteFilesDto,' 옵셔널이라 그랬어~')
     return this.userDataService.deleteUserFiles(userId, deleteFilesDto)
   }
 }

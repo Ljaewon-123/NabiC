@@ -48,14 +48,15 @@ const pushRouter = (folderName?: string) => {
     name: 'Path', 
     params: { 
       folderName: folderName, 
-      directory: rootDivision(route.params.directory as string, folderName)
+      directory: rootDivision(route.params.directory , folderName)
     } 
   })
 
 }
 
-function rootDivision(directory: any, folderName:any){
-  if(!directory) return folderName
+function rootDivision(directory: string | string[], folderName:string){
+  const dir = Array.isArray(directory) ? directory[0] : directory;
+  if(!dir) return folderName
 
   return `${directory}/${folderName}`
 }

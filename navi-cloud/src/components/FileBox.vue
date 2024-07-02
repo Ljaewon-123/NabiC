@@ -120,7 +120,7 @@ const selected = computed(() => {
 })
 
 
-const itemType = (fileAction:any, folderAction: any) => {
+const itemType = (fileAction: BoxType, folderAction: BoxType):BoxType => {
   if(props.item) return fileAction
 
   return folderAction

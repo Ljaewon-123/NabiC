@@ -2,7 +2,7 @@
 // 이미 File라는 type이있네 ?
 interface UploadFiles {
   lastModified: number
-  lastModifiedDate: any
+  lastModifiedDate: string
   name: string
   size: number
   type: string
