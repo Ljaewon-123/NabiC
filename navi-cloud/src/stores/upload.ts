@@ -40,7 +40,12 @@ export const useUpload = defineStore('upload', () => {
   
       formData.append('lastModified',  String(file.lastModified) )
       formData.append('lastModifiedDate', String(file.lastModifiedDate) )
+      
     })
+    formData.append('currentPath', 
+      concatenateFolderNames(route.params.folderName)
+    )
+    // route.params.folderName ?? '/'
   
     console.log(files, typeof files)
     await upload.post('files', formData)
@@ -69,7 +74,9 @@ export const useUpload = defineStore('upload', () => {
       formData.append('lastModifiedDate', String(file.lastModifiedDate) )
     })
   
-    formData.append('parentName', route.params.folder as string );
+    formData.append('currentPath', 
+      concatenateFolderNames(route.params.folderName)
+    )
     
     await upload.post('folder', formData)
 
@@ -77,6 +84,13 @@ export const useUpload = defineStore('upload', () => {
     
     folderReset()
   })
+
+  function concatenateFolderNames(folderName: string | string[] | undefined){
+    if(!folderName) return '/'
+    if(Array.isArray(folderName)) return folderName.join('')
+
+    return folderName
+  }
 
   return {
     onChange ,

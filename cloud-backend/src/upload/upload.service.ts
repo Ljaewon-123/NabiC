@@ -76,17 +76,15 @@ export class UploadService {
   // 빈폴더만 선택하면 아무것도 안온다 
   // 실직적으로 폴더 전송은 내부 파일만 보내는 거라서
   // 그래서 폴더 생성이 따로있는건가?? 
-  async createPathFiles(files: ModifiedFile[] | Files[]){
+  async createPathFiles(files: ModifiedFile[] | Files[], currentPath: string){
 
     const folders = []
 
     files.forEach( file => {
       const directorySegments = file.directory.split('/');
-      // let currentParent = parent;
+      console.log(directorySegments, directorySegments.slice(0, -1).join('/'))
       directorySegments.reduce( (acc: ModifiedFolder[], current: string, index:number, arr: string[] ) => {
         const existingFolder = acc.find(folder => folder.folderName == current );
-
-        // if(index != 0) currentParent = arr[index - 1];
 
         const folder = new Folders();
 
@@ -97,11 +95,12 @@ export class UploadService {
           }
         } 
         else {
+          const result = this.defaultPath(currentPath) + directorySegments.slice(0, -1).join('/');
           // 기존 폴더가 없으면 새 폴더를 추가
           folder.folderName = current
           folder.file = index == arr.length - 1 ? [file] : []
           folder.userId = file.userId
-          folder.directory = directorySegments.length == 1 ? '/' : directorySegments.slice(0, -1).join('/');
+          folder.directory = result
           acc.push(folder)
         }
 
@@ -113,7 +112,7 @@ export class UploadService {
 
     const parentFolder = folders[0];
     const newParentName = await this.validatorFolder(parentFolder)
-    console.log('newname', newParentName)
+    // console.log('newname', newParentName)
     // folders[0].folderName = newParentName.folderName
 
     const updatedChildFolders = await this.renameChildFolders(folders, parentFolder, newParentName.folderName);
@@ -121,16 +120,25 @@ export class UploadService {
     const renamedFiles = await this.renameFilesDirectory(files, parentFolder.folderName, newParentName.folderName);
     
     updatedChildFolders[0].folderName = newParentName.folderName
-    console.log(updatedChildFolders)
-    console.log('|||||||||')
-    console.log(renamedFiles)
+    // console.log(folders)
+    console.log(updatedChildFolders,'update name')
+    // console.log('|||||||||')
+    // console.log(renamedFiles)
 
 
     // m : m은 save여야 join까지 가나보네...
     // const vaildate = await this.validateFiles(files) // 안해도될듯?? 다 쌔거라서 어차피 경로다 다다름 
+
+    const path = this.defaultPath(currentPath)
+    if(path !== ''){
+      files.forEach( file => {
+        file.directory = path + '/' + file.directory
+      })
+    }
     
-    await this.filesRepository.save(files)
-    await this.foldersRepository.save(folders)
+    console.log(files, renamedFiles)
+    // await this.filesRepository.save(files)
+    // await this.foldersRepository.save(folders)
 
   }
 
@@ -233,7 +241,8 @@ export class UploadService {
     })
 
     console.log(validate, 'validate')
-    if(validate) throw 'already match'
+    // 기존 중복은 저장하지 않는다 -> -copy(n)으로 저장한다로 바뀜 
+    // if(validate) throw 'already match'
 
     const folder = this.foldersRepository.create({
       folderName: dto.fileName,
@@ -273,6 +282,12 @@ export class UploadService {
     }
 
     return files
+  }
+
+  defaultPath(currentPath:string){
+    if(currentPath == '/') return ''
+
+    return currentPath 
   }
 
 }

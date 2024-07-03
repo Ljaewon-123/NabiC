@@ -186,7 +186,7 @@ const createFolder = async() => {
     fileName: newFolderName.value,
     depth: 0, // 임시로 0 
     parent: route.params.folderName
-  });
+  }).then(() => trigger())
 
   console.log(result)
 }
@@ -202,9 +202,8 @@ const deleteFiles = async() => {
       itemList: fileCheckList.value,
       directory: route.params.folderName ?? '/'
     }
-  })
+  }).then(() => trigger())
 
-  trigger()
 }
 
 const downloadFiles = async() => {
