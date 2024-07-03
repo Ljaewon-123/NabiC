@@ -22,7 +22,7 @@ import { UndefinedPipe } from './pipes/undefined-pipe';
       entities: [__dirname + '/**/**/*.entity.{js,ts}'],
       synchronize: true,
       namingStrategy: new SnakeNamingStrategy(),
-      // logging: true,
+      logging: true,
     }),
     AuthModule,
     UploadModule,

@@ -42,7 +42,7 @@ export class UserDataService {
       .getOne();
       // .where('folders.depth = :depth')
 
-    console.log(result)
+    // console.log(result)
     return result;
   }
 
@@ -106,7 +106,6 @@ export class UserDataService {
     return downloadBuf
   }
 
-  // name뒤에 '/'이게 있어야 -copy를 피하면서 잡음 언제 다고치지;; 한번에 못찾나?
   // 쿼리빌더 변경 이게 제일 수정 적임 
   findFolderInnderBuffer(userId:number, downloadDto:CheckedFilesDto, name:string){
     const directoryCondition = downloadDto.directory === '/' ? '' : `${downloadDto.directory}/`;
@@ -114,7 +113,7 @@ export class UserDataService {
     .where('file.userId = :userId', { userId })
     .andWhere(`file.directory LIKE :directory`, { directory: `${directoryCondition}${name}%` })
     .andWhere(`file.directory NOT LIKE :notDirectory`, { notDirectory: `${directoryCondition}${name}-copy%` })
-    .select(['file.id', 'file.file'])
+    .select(['file.id', 'file.file', 'file.fileName'])
     .getMany();
   }
 
@@ -126,7 +125,8 @@ export class UserDataService {
       },
       select:{
         id:true,
-        file: true
+        file: true,
+        fileName: true
       }
     });
   }
@@ -136,9 +136,18 @@ export class UserDataService {
     deleteFilesDto.itemList.forEach( async item => {
       if(!item.isFolder) return await this.filesRepository.delete({ userId:userId, id: item.id })
 
-      // console.log(item.name,'????')
+      // console.log(deleteFilesDto.directory,'????',item.name)
       await Promise.all([
-        this.foldersRepository.delete({ userId:userId, id: item.id }),
+        this.foldersRepository.delete({ 
+          userId:userId, 
+          id: item.id ,
+        }),
+        this.foldersRepository.createQueryBuilder()
+          .delete()
+          .where('userId = :userId', { userId })
+          .andWhere(`directory LIKE :directory`, { directory: `${item.name}%` })
+          .andWhere(`directory NOT LIKE :notDirectory`, { notDirectory: `${item.name}-copy%` })
+          .execute(),
         this.deleteFiles(userId, deleteFilesDto, item.name)
       ])
       .catch((error) => {
@@ -157,6 +166,7 @@ export class UserDataService {
       .delete()
       .where('userId = :userId', { userId })
       .andWhere(`directory LIKE :directory`, { directory: `${directoryCondition}${name}%` })
+      .andWhere(`directory NOT LIKE :notDirectory`, { notDirectory: `${directoryCondition}${name}-copy%` })
       .execute();
   }
 
