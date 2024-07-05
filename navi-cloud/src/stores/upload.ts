@@ -43,7 +43,7 @@ export const useUpload = defineStore('upload', () => {
       
     })
     formData.append('currentPath', 
-      concatenateFolderNames(route.params.folderName)
+      concatenateFolderNames(route.params.directory)
     )
     // route.params.folderName ?? '/'
   
@@ -75,7 +75,7 @@ export const useUpload = defineStore('upload', () => {
     })
   
     formData.append('currentPath', 
-      concatenateFolderNames(route.params.folderName)
+      concatenateFolderNames(route.params.directory)
     )
     
     await upload.post('folder', formData)

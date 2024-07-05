@@ -185,7 +185,7 @@ const createFolder = async() => {
   const result = await naviapi.post('upload/create/folder', {
     fileName: newFolderName.value,
     depth: 0, // 임시로 0 
-    parent: route.params.folderName
+    directory: route.params.folderName
   }).then(() => trigger())
 
   console.log(result)

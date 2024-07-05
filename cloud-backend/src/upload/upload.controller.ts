@@ -49,6 +49,7 @@ export class UploadController {
     const lastModified = body.lastModified
     const lastModifiedDate = body.lastModifiedDate
     const currentPath = body.currentPath
+    console.log(currentPath, '@@@@@@@@@@@@@@@@@@')
     const newFileArray = files.map( (file:Express.Multer.File, index: number ) => {
       return {
         userId: userId,
@@ -109,7 +110,7 @@ export class UploadController {
       })
     })
 
-    // console.log(newFileArray)
+    console.log(currentPath, '@@@@@@@@@@@@@@@@@')
     await this.uploadService.createPathFiles(newFileArray , currentPath)
     
   }
