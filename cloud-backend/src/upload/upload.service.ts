@@ -288,6 +288,11 @@ export class UploadService {
     if (result === '/') {
         return '/';
     }
+
+     // 첫 글자가 '/'인 경우, 첫 글자 '/' 제거
+    if (result.startsWith('/')) {
+      result = result.slice(1);
+    }
     
     // 문자열 맨 뒤에 '/'가 있는 경우 제거
     if (result.endsWith('/')) {
