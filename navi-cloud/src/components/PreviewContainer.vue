@@ -9,7 +9,19 @@
     </component>
 
     <template #fallback>
-      로딩중...
+      <v-card
+        width="150"
+        height="150"
+      >
+        <div class="d-flex align-center justify-center fill-height">
+          <v-progress-circular
+            size="50"
+            width="8"
+            color="grey-lighten-4"
+            indeterminate
+          ></v-progress-circular>
+        </div>
+      </v-card>
     </template>
   </Suspense>
 </keep-alive>
