@@ -159,6 +159,16 @@ import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { useFileToolbarStore } from '@/stores/fileToolbar';
 import { useReloadStore } from '@/stores/reload';
+import type { Buffer } from 'buffer';
+
+interface DownloadData{
+  id:number
+  fileName: string
+  file: { data: Buffer, type: "Buffer" }
+}
+interface DownloadError{
+  error: 'download error'
+}
 
 const route = useRoute()
 
@@ -207,12 +217,48 @@ const deleteFiles = async() => {
 }
 
 const downloadFiles = async() => {
-  await naviapi.post('user-data/download',{
+  const getData = await naviapi.post('user-data/download',{
     itemList: fileCheckList.value,
     directory: route.params.folderName ?? '/'
   })
+  console.log(getData.data,' download')
+  const downloadData = getData.data
+  downloadData.forEach((
+    files: DownloadData | DownloadData[] | DownloadError
+  )=> {
+    if(Array.isArray(files)) {
+      files.forEach( file => {
+        downloadBlob(file.file.data, file.fileName);
+      })
+    }
+
+    else if( 'error' in files) return '전역 에러얼럿 필요 ';
+
+    // 흠... 
+    else{
+      downloadBlob(files.file.data, files.fileName);
+    }
+  })
 
   // trigger()
+}
+
+function downloadBlob(buffer:Buffer, filename: string) {
+  // Blob 생성
+  const blob = new Blob([new Uint8Array(buffer)]);
+  const url = URL.createObjectURL(blob);
+
+  // a 태그 생성
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename; 
+
+  document.body.appendChild(a);
+  a.click();
+
+  // a 태그와 URL 객체 정리
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 watch(newFolder, () => {

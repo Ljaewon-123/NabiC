@@ -100,9 +100,9 @@ const mouseover = ref(false)
 const star = ref(false)
 const checkBoxHover = ref(false)
 
-watch(fileCheckList, () => {
-  console.log(fileCheckList.value,'아니 대체왜??', selected.value)
-})
+// watch(fileCheckList, () => {
+//   console.log(fileCheckList.value,'아니 대체왜??', selected.value)
+// })
 
 const selected = computed(() => {
   if(!fileCheckList.value) return mouseover.value
