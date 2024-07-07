@@ -2,9 +2,9 @@
 
 <v-container fluid >
   <v-row>
-    <v-col>
+    <v-col class="pa-0 px-2">
       <span class="main-title">
-        ROOT
+        <file-router-path></file-router-path>
       </span>
     </v-col>
   </v-row>
@@ -159,6 +159,7 @@ import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { useFileToolbarStore } from '@/stores/fileToolbar';
 import { useReloadStore } from '@/stores/reload';
+import FileRouterPath from '@/components/FileRouterPath.vue'
 import type { Buffer } from 'buffer';
 
 interface DownloadData{
@@ -222,7 +223,9 @@ const downloadFiles = async() => {
     directory: route.params.folderName ?? '/'
   })
   console.log(getData.data,' download')
+
   const downloadData = getData.data
+
   downloadData.forEach((
     files: DownloadData | DownloadData[] | DownloadError
   )=> {
@@ -232,6 +235,7 @@ const downloadFiles = async() => {
       })
     }
 
+    //  자체적인 catch # 여러개 나오면 어떻할려고?? 상관없을듯 
     else if( 'error' in files) return '전역 에러얼럿 필요 ';
 
     // 흠... 
@@ -264,6 +268,7 @@ function downloadBlob(buffer:Buffer, filename: string) {
 watch(newFolder, () => {
   newFolderName.value = ''
 })
+
 
 const hasSelectedFiles = computed(() => fileCheckList.value.length != 0 ? true : false )
 

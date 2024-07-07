@@ -7,7 +7,9 @@
 
   <v-app-bar-title 
     style="cursor: pointer;" @click="router.push('/main')"
-  >MY CLOUD</v-app-bar-title>
+  >
+    MY CLOUD
+  </v-app-bar-title>
 
   <v-spacer></v-spacer>
 
