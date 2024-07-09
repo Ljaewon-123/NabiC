@@ -3,6 +3,7 @@ import { useFileDialog } from '@vueuse/core'
 import { upload } from '@/boots/AxiosInstance'
 import { useRoute } from 'vue-router'
 import { useReloadStore } from './reload'
+import type { AxiosProgressEvent } from 'axios'
 
 interface Files extends File {
   lastModifiedDate: Date
@@ -48,7 +49,13 @@ export const useUpload = defineStore('upload', () => {
     // route.params.folderName ?? '/'
   
     console.log(files, typeof files)
-    await upload.post('files', formData)
+    await upload.post('files', formData, {
+      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
+        console.log(percent, progressEvent);
+        console.log('@@@@@@@@@ 이거됨??')
+      },
+    } )
 
     trigger()
   
@@ -78,7 +85,13 @@ export const useUpload = defineStore('upload', () => {
       concatenateFolderNames(route.params.directory)
     )
     
-    await upload.post('folder', formData)
+    await upload.post('folder', formData, {
+      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
+        console.log(percent, progressEvent);
+        console.log('@@@@@@@@@ 이거됨??')
+      },
+    })
 
     trigger()
     

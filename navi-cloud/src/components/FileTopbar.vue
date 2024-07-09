@@ -161,6 +161,7 @@ import { useFileToolbarStore } from '@/stores/fileToolbar';
 import { useReloadStore } from '@/stores/reload';
 import FileRouterPath from '@/components/FileRouterPath.vue'
 import type { Buffer } from 'buffer';
+import type { AxiosProgressEvent } from 'axios';
 
 interface DownloadData{
   id:number
@@ -221,6 +222,13 @@ const downloadFiles = async() => {
   const getData = await naviapi.post('user-data/download',{
     itemList: fileCheckList.value,
     directory: route.params.folderName ?? '/'
+  },
+  {
+    onDownloadProgress: (progressEvent: AxiosProgressEvent) => {
+      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
+      console.log(progressEvent, '@@@@@@@@')
+      console.log(percent);
+    }
   })
   console.log(getData.data,' download')
 
