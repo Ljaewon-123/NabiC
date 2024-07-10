@@ -110,6 +110,14 @@
   <v-divider></v-divider>
 </v-container>
 
+<outside-click-modal v-model="progressModal"
+  :x-position="{ right: 3 }"  :top="90"
+>
+  <v-card>
+    hello?
+  </v-card>
+</outside-click-modal>
+
 <v-dialog
   v-model="newFolder"
   max-width="400"
@@ -173,6 +181,7 @@ interface DownloadError{
 }
 
 const route = useRoute()
+const progressModal = ref(true)
 
 const { 
   onChange, 
