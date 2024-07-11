@@ -110,11 +110,38 @@
   <v-divider></v-divider>
 </v-container>
 
+<!-- 로딩화면, 에러화면, 완료시 화면 근데 이건 suspense가 아님  -->
 <outside-click-modal v-model="progressModal"
-  :x-position="{ right: 3 }"  :top="90"
+  :x-position="{ right: 3 }"  :top="45"
+  :width="380"
 >
   <v-card>
-    hello?
+    <stateful-renderer>
+      <v-container style="height: 400px;">
+        <v-row
+          align-content="center"
+          class="fill-height"
+          justify="center"
+        >
+          <v-col
+            class="text-subtitle-1 text-center"
+            cols="12"
+          >
+            Getting your files
+          </v-col>
+          <v-col cols="6" class="text-center">
+            <v-progress-linear
+              v-model="downloadPercent"
+              color="deep-purple-accent-4"
+              height="6"
+              rounded
+            ></v-progress-linear>
+            <span>{{ downloadPercent }}%</span>
+          </v-col>
+        </v-row>
+      </v-container>
+    </stateful-renderer>
+        
   </v-card>
 </outside-click-modal>
 
@@ -200,6 +227,7 @@ const allCheck = ref<boolean>(false)
 const toggleBtn = ref()
 const newFolder = ref<boolean>(false)
 const newFolderName = ref<string>('')
+const downloadPercent = ref(100)
 
 const createFolder = async() => {
   if(!newFolderName.value) return '전역 얼럿 띄우는 기능 추가 '
@@ -237,6 +265,7 @@ const downloadFiles = async() => {
       const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
       console.log(progressEvent, '@@@@@@@@')
       console.log(percent);
+      downloadPercent.value = percent
     }
   })
   console.log(getData.data,' download')

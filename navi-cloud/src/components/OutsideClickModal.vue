@@ -4,6 +4,7 @@
 <Teleport to="body">
 <Transition name="bounce">
   <v-card v-if="model" class="modal"
+  :width="props.width"
   :style="{
     top: props.top + '%',
     left: props.xPosition.left + '%',
@@ -28,6 +29,10 @@
 
 const model = defineModel({ default: false })
 const props = defineProps({
+  width:{
+    type: Number,
+    default: 0
+  },
   xPosition: {
     type: Object,
     default() {
