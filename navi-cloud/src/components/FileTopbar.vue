@@ -16,6 +16,7 @@
         <div class="d-flex gap-8 align-center">
           <v-checkbox
             hide-details
+            min-width="40"
             v-model="allCheck"
             @change="toggleAll"
           ></v-checkbox>  
