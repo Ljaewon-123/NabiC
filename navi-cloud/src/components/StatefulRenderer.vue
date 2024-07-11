@@ -1,25 +1,28 @@
 <!-- 스타일 맞추기 힘드네 ;;; -->
 <template>
-<div  v-if="props.visibleSuccess" >
-  <slot></slot>
-</div>
-<div v-if="props.visibleLoading" >
-  <slot name="loading"></slot>
-</div>
-<div v-if="props.visibleError" >
-  <slot name="error"></slot>
-</div>
+  <slot v-if="currentStatus == 'error'" name="error"></slot>
+  <slot v-else-if="currentStatus == 'success'" ></slot>
+  <slot v-else-if="currentStatus == 'loading'" name="loading">
+    <v-loading :size="100" :width="4"></v-loading>
+  </slot>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 
 const props = defineProps({
-  visibleSuccess: {
-    type: Boolean,
-    default: true
-  },
-  visibleLoading: Boolean,
-  visibleError: Boolean,
+  stateSuccess: Boolean,
+  stateLoading: Boolean,
+  stateError: Boolean,
 })
+
+const currentStatus = computed(() => {
+  if (props.stateError) return 'error';
+  else if (props.stateSuccess)   return 'success';
+  else if (props.stateLoading)   return 'loading';
+
+  return 'loading';
+});
 
 </script>

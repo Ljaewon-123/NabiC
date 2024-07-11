@@ -116,12 +116,16 @@
   :width="380"
 >
   <v-card>
-    <stateful-renderer>
-      <v-container style="height: 400px;">
-        <v-row
-          align-content="center"
-          class="fill-height"
-          justify="center"
+    <v-container style="height: 400px;">
+      <v-row
+        align-content="center"
+        class="fill-height"
+        justify="center"
+      >
+        <stateful-renderer
+        :state-success="downloadSuccess"
+        :state-error="downloadError"
+        :state-loading="downloadLoading"
         >
           <v-col
             class="text-subtitle-1 text-center"
@@ -138,10 +142,12 @@
             ></v-progress-linear>
             <span>{{ downloadPercent }}%</span>
           </v-col>
-        </v-row>
-      </v-container>
-    </stateful-renderer>
-        
+          <template #error>
+            fail
+          </template>
+        </stateful-renderer>
+      </v-row>
+    </v-container>
   </v-card>
 </outside-click-modal>
 
@@ -149,38 +155,10 @@
   v-model="newFolder"
   max-width="400"
 >
-
-  <v-card
-    prepend-icon="mdi-folder-plus-outline"
-    title="Create Folder?"
-  >
-    <template #text>
-      <v-text-field
-        v-model="newFolderName"
-        hint="Enter your new folder name"
-        placeholder="Foler Name"
-        persistent-hint
-        density="comfortable"
-        :rules="requiredArr"
-      ></v-text-field>
-    </template>
-    <template #actions>
-      <v-spacer></v-spacer>
-
-      <v-btn 
-        color="primary" 
-        variant="tonal" 
-        @click="newFolder = false, createFolder()"
-        @keyup.enter="createFolder()"
-      >
-        Save
-      </v-btn>
-
-      <v-btn color="error" variant="outlined" @click="newFolder = false">
-        Cancel
-      </v-btn>
-    </template>
-  </v-card>
+  <create-new-folder
+    v-model="newFolder"
+    v-model:name="newFolderName"
+  ></create-new-folder>
 </v-dialog>
 
 </template>
@@ -197,6 +175,7 @@ import { useReloadStore } from '@/stores/reload';
 import FileRouterPath from '@/components/FileRouterPath.vue'
 import type { Buffer } from 'buffer';
 import type { AxiosProgressEvent } from 'axios';
+import CreateNewFolder from '@/components/CreateNewFolder.vue'
 
 interface DownloadData{
   id:number
@@ -208,7 +187,12 @@ interface DownloadError{
 }
 
 const route = useRoute()
-const progressModal = ref(true)
+const progressModal = ref(false)
+
+// 사용법이 너무 번거로워..... 너무너무 번거로워 
+const downloadSuccess = ref(false)
+const downloadError = ref(false)
+const downloadLoading = ref(false)
 
 const { 
   onChange, 
@@ -227,23 +211,9 @@ const allCheck = ref<boolean>(false)
 const toggleBtn = ref()
 const newFolder = ref<boolean>(false)
 const newFolderName = ref<string>('')
-const downloadPercent = ref(100)
+const downloadPercent = ref(0)
 
-const createFolder = async() => {
-  if(!newFolderName.value) return '전역 얼럿 띄우는 기능 추가 '
-  const result = await naviapi.post('upload/create/folder', {
-    fileName: newFolderName.value,
-    depth: 0, // 임시로 0 
-    directory: route.params.folderName
-  }).then(() => trigger())
 
-  console.log(result)
-}
-
-const requiredArr = [
-  (v:string) => !!v || 'Field is required',
-  (v: string) => /^[^\\\\/:*?"<>|]+$/.test(v) || "Don't use symbol",
-]
 
 const deleteFiles = async() => {
   await naviapi.delete('user-data', {
@@ -256,19 +226,37 @@ const deleteFiles = async() => {
 }
 
 const downloadFiles = async() => {
+
+  progressModal.value = true
+  downloadSuccess.value = false
+
   const getData = await naviapi.post('user-data/download',{
     itemList: fileCheckList.value,
     directory: route.params.folderName ?? '/'
   },
   {
     onDownloadProgress: (progressEvent: AxiosProgressEvent) => {
+      downloadLoading.value = true
       const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
       console.log(progressEvent, '@@@@@@@@')
       console.log(percent);
       downloadPercent.value = percent
     }
+  }).catch((data) => {
+    // 서버에서 에러처리를 따로해서 흠...
+    // 성공한 데이터는 저장으로 처리하고싶은데... 아닌가??
+    downloadError.value = true
+    return data
   })
-  console.log(getData.data,' download')
+
+  // 예상못한게 자꾸 생기네;
+  if(getData.status == 201 || getData.status == 200){
+    downloadError.value = false
+    downloadLoading.value = false
+    downloadSuccess.value = true
+  }
+
+  console.log(getData.data,' download', getData)
 
   const downloadData = getData.data
 
