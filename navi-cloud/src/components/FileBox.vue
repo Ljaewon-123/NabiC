@@ -65,7 +65,6 @@ import type { Buffer } from 'buffer';
 import type { PropType } from 'vue'
 import type { UserFile, Folder } from '@/types/FileBox';
 import { formatBytes } from '@/utils'
-import { useEasyLightbox } from 'vue-easy-lightbox';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useFileToolbarStore } from '@/stores/fileToolbar';

@@ -113,7 +113,7 @@ export class UserDataService {
     .where('file.userId = :userId', { userId })
     .andWhere(`file.directory LIKE :directory`, { directory: `${directoryCondition}${name}%` })
     .andWhere(`file.directory NOT LIKE :notDirectory`, { notDirectory: `${directoryCondition}${name}-copy%` })
-    .select(['file.id', 'file.file', 'file.fileName'])
+    .select(['file.id', 'file.file', 'file.fileName', 'file.fileType'])
     .getMany();
   }
 
@@ -126,6 +126,7 @@ export class UserDataService {
       select:{
         id:true,
         file: true,
+        fileType: true,
         fileName: true
       }
     });

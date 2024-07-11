@@ -131,19 +131,41 @@
             class="text-subtitle-1 text-center"
             cols="12"
           >
-            Getting your files
+            <v-list height="380" lines="two">
+              <v-list-item
+                v-for="file, index in downloadItems"
+                :key="file.id ?? index"
+                :title="file.fileName"
+              >
+                <template v-slot:prepend>
+                  <v-avatar color="deep-purple-accent-4">
+                    <v-icon color="white">
+                      {{ fileType(file.fileType) }}
+                    </v-icon>
+                  </v-avatar>
+                </template>
+              </v-list-item>
+            </v-list>
           </v-col>
-          <v-col cols="6" class="text-center">
-            <v-progress-linear
-              v-model="downloadPercent"
-              color="deep-purple-accent-4"
-              height="6"
-              rounded
-            ></v-progress-linear>
-            <span>{{ downloadPercent }}%</span>
-          </v-col>
+          <template #loading>
+            <v-col
+              class="text-subtitle-1 text-center"
+              cols="12"
+            >
+              Getting your files
+            </v-col>
+            <v-col cols="6" class="text-center">
+              <v-progress-linear
+                v-model="downloadPercent"
+                color="deep-purple-accent-4"
+                height="6"
+                rounded
+              ></v-progress-linear>
+              <span>{{ downloadPercent }}%</span>
+            </v-col>
+          </template>
           <template #error>
-            fail
+            fail download please try again
           </template>
         </stateful-renderer>
       </v-row>
@@ -181,19 +203,25 @@ interface DownloadData{
   id:number
   fileName: string
   file: { data: Buffer, type: "Buffer" }
+  fileType: string
 }
 interface DownloadError{
   error: 'download error'
 }
+interface DownloadErrorType{
+  id?: number
+  fileName: 'download error'
+  fileType: "error/error"
+}
 
 const route = useRoute()
-const progressModal = ref(false)
 
+const progressModal = ref(false)
 // 사용법이 너무 번거로워..... 너무너무 번거로워 
 const downloadSuccess = ref(false)
 const downloadError = ref(false)
 const downloadLoading = ref(false)
-
+const downloadItems = ref<(DownloadData | DownloadErrorType)[]>([])
 const { 
   onChange, 
   folderOnChange ,
@@ -213,7 +241,18 @@ const newFolder = ref<boolean>(false)
 const newFolderName = ref<string>('')
 const downloadPercent = ref(0)
 
-
+const fileType = (itemType?: string) => {
+  console.assert(itemType == undefined, 'is must not undeifned')
+  if(!itemType) return 
+  const type = itemType.split('/')[0]
+  switch(type){
+    case 'image' : return "mdi-image"
+    case "audio":  return "mdi-volume-high"
+    case "video" : return "mdi-video-outline"
+    case "error" : return "mdi-alert-circle"
+    default : return "mdi-dots-horizontal-circle"
+  }
+}
 
 const deleteFiles = async() => {
   await naviapi.delete('user-data', {
@@ -245,6 +284,7 @@ const downloadFiles = async() => {
   }).catch((data) => {
     // 서버에서 에러처리를 따로해서 흠...
     // 성공한 데이터는 저장으로 처리하고싶은데... 아닌가??
+    // 여기는 통신상태에서 완전히 실패했을때를 가정
     downloadError.value = true
     return data
   })
@@ -265,15 +305,23 @@ const downloadFiles = async() => {
   )=> {
     if(Array.isArray(files)) {
       files.forEach( file => {
+        downloadItems.value.push(file)
         downloadBlob(file.file.data, file.fileName);
       })
     }
 
     //  자체적인 catch # 여러개 나오면 어떻할려고?? 상관없을듯 
-    else if( 'error' in files) return '전역 에러얼럿 필요 ';
+    else if( 'error' in files) {
+      downloadItems.value.push({
+        fileName: 'download error',
+        fileType: 'error/error'
+      })
+      return 
+    }
 
     // 흠... 
     else{
+      downloadItems.value.push(files)
       downloadBlob(files.file.data, files.fileName);
     }
   })
