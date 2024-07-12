@@ -4,6 +4,7 @@ import { upload } from '@/boots/AxiosInstance'
 import { useRoute } from 'vue-router'
 import { useReloadStore } from './reload'
 import type { AxiosProgressEvent } from 'axios'
+import { useProgressStore } from './progess'
 
 interface Files extends File {
   lastModifiedDate: Date
@@ -12,9 +13,19 @@ interface Files extends File {
 // 이미 있는이름같은데 
 export const useUpload = defineStore('upload', () => {
 
-  const reloadStore = useReloadStore()
   const { trigger, reloadReq } = useReloadStore()
-  const { reload } = storeToRefs(reloadStore)
+
+  const progressStore = useProgressStore()
+  const { 
+    startPromise,
+    loadPromise,
+    successPromise,
+    getDownloadItems,
+    catchPromise,
+  } = useProgressStore()
+  const { 
+    downloadPercent,
+  } = storeToRefs(progressStore)
 
   const route = useRoute()
 
@@ -34,8 +45,13 @@ export const useUpload = defineStore('upload', () => {
     const formData = new FormData();
   
     Object.keys(files).forEach( (fileIndex: string) => {
-  
       const file = files[Number(fileIndex)] as Files
+      
+      getDownloadItems({
+        id: Number(fileIndex),
+        fileName: file.name,
+        fileType: file.type,
+      })
       
       formData.append('files', file, file.name );
   
@@ -47,15 +63,22 @@ export const useUpload = defineStore('upload', () => {
       concatenateFolderNames(route.params.directory)
     )
     // route.params.folderName ?? '/'
-  
-    console.log(files, typeof files)
-    await upload.post('files', formData, {
+    // console.log(files, typeof files)
+
+    startPromise()
+    const data = await upload.post('files', formData, {
       onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+        loadPromise()
         const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
         console.log(percent, progressEvent);
-        console.log('@@@@@@@@@ 이거됨??')
+        downloadPercent.value = percent
       },
-    } )
+    }).catch((data) => {
+      catchPromise()
+      return data
+    })
+
+    successPromise(data.status)
 
     trigger()
   
@@ -69,13 +92,18 @@ export const useUpload = defineStore('upload', () => {
     if(!folders) return 
   
     const files = folder.value as FileList 
-    console.log(files, 'folder???', typeof files)
+    // console.log(files, 'folder???', typeof files)
   
     const formData = new FormData();
   
     // webkitRelativePath
     Object.keys(files).forEach( (fileIndex: string) => {
       const file = files[Number(fileIndex)] as Files
+      getDownloadItems({
+        id: Number(fileIndex),
+        fileName: file.name,
+        fileType: file.type,
+      })
       formData.append('pathFiles', file );
       formData.append('lastModified',  String(file.lastModified) )
       formData.append('lastModifiedDate', String(file.lastModifiedDate) )
@@ -85,13 +113,20 @@ export const useUpload = defineStore('upload', () => {
       concatenateFolderNames(route.params.directory)
     )
     
-    await upload.post('folder', formData, {
+    startPromise()
+    const data = await upload.post('folder', formData, {
       onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+        loadPromise()
         const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
         console.log(percent, progressEvent);
-        console.log('@@@@@@@@@ 이거됨??')
+        downloadPercent.value = percent
       },
+    }).catch((data) => {
+      catchPromise()
+      return data
     })
+
+    successPromise(data.status)
 
     trigger()
     

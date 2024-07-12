@@ -1,10 +1,10 @@
-import { ref, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 
 interface DownloadData{
   id:number
   fileName: string
-  file: { data: Buffer, type: "Buffer" }
+  file?: { data: Buffer, type: "Buffer" }
   fileType: string
 }
 interface DownloadErrorType{
@@ -34,13 +34,33 @@ export const useProgressStore = defineStore('progress', () => {
   const loadPromise = () => {
     downloadLoading.value = true
   }
+  const catchPromise = () => {
+    downloadError.value = true
+  }
+
+  const successPromise = (status: 200 | 201) => {
+    if(status == 201 || status == 200){
+      downloadError.value = false
+      downloadLoading.value = false
+      downloadSuccess.value = true
+    }
+  }
+
+  watch( progressModal, (newVal) => {
+    if(!newVal) downloadItems.value = []
+  } )
 
   return { 
+    startPromise,
+    loadPromise,
+    successPromise,
     getDownloadItems,
+    catchPromise,
     progressModal,
     downloadSuccess,
     downloadError,
     downloadLoading,
     downloadItems,
+    downloadPercent,
   }
 })

@@ -116,62 +116,7 @@
   :x-position="{ right: 3 }"  :top="45"
   :width="380"
 >
-  <v-card>
-    <v-container style="height: 400px;">
-      <v-row
-        align-content="center"
-        class="fill-height"
-        justify="center"
-      >
-        <stateful-renderer
-        :state-success="downloadSuccess"
-        :state-error="downloadError"
-        :state-loading="downloadLoading"
-        >
-          <v-col
-            class="text-subtitle-1 text-center"
-            cols="12"
-          >
-            <v-list height="380" lines="two">
-              <v-list-item
-                v-for="file, index in downloadItems"
-                :key="file.id ?? index"
-                :title="file.fileName"
-              >
-                <template v-slot:prepend>
-                  <v-avatar color="deep-purple-accent-4">
-                    <v-icon color="white">
-                      {{ fileType(file.fileType) }}
-                    </v-icon>
-                  </v-avatar>
-                </template>
-              </v-list-item>
-            </v-list>
-          </v-col>
-          <template #loading>
-            <v-col
-              class="text-subtitle-1 text-center"
-              cols="12"
-            >
-              Getting your files
-            </v-col>
-            <v-col cols="6" class="text-center">
-              <v-progress-linear
-                v-model="downloadPercent"
-                color="deep-purple-accent-4"
-                height="6"
-                rounded
-              ></v-progress-linear>
-              <span>{{ downloadPercent }}%</span>
-            </v-col>
-          </template>
-          <template #error>
-            fail download please try again
-          </template>
-        </stateful-renderer>
-      </v-row>
-    </v-container>
-  </v-card>
+  <download-modal></download-modal>
 </outside-click-modal>
 
 <v-dialog
@@ -199,6 +144,8 @@ import FileRouterPath from '@/components/FileRouterPath.vue'
 import type { Buffer } from 'buffer';
 import type { AxiosProgressEvent } from 'axios';
 import CreateNewFolder from '@/components/CreateNewFolder.vue'
+import { useProgressStore } from '@/stores/progess';
+import DownloadModal from '@/components/DownloadModal.vue'
 
 interface DownloadData{
   id:number
@@ -217,12 +164,18 @@ interface DownloadErrorType{
 
 const route = useRoute()
 
-const progressModal = ref(false)
-// 사용법이 너무 번거로워..... 너무너무 번거로워 
-const downloadSuccess = ref(false)
-const downloadError = ref(false)
-const downloadLoading = ref(false)
-const downloadItems = ref<(DownloadData | DownloadErrorType)[]>([])
+const progressStore = useProgressStore()
+const { 
+  startPromise,
+  loadPromise,
+  successPromise,
+  getDownloadItems,
+  catchPromise,
+} = useProgressStore()
+const { 
+  progressModal,
+  downloadPercent,
+} = storeToRefs(progressStore)
 const { 
   onChange, 
   folderOnChange ,
@@ -240,20 +193,8 @@ const allCheck = ref<boolean>(false)
 const toggleBtn = ref()
 const newFolder = ref<boolean>(false)
 const newFolderName = ref<string>('')
-const downloadPercent = ref(0)
 
-const fileType = (itemType?: string) => {
-  console.assert(itemType == undefined, 'is must not undeifned')
-  if(!itemType) return 
-  const type = itemType.split('/')[0]
-  switch(type){
-    case 'image' : return "mdi-image"
-    case "audio":  return "mdi-volume-high"
-    case "video" : return "mdi-video-outline"
-    case "error" : return "mdi-alert-circle"
-    default : return "mdi-dots-horizontal-circle"
-  }
-}
+
 
 const deleteFiles = async() => {
   await naviapi.delete('user-data', {
@@ -267,8 +208,7 @@ const deleteFiles = async() => {
 
 const downloadFiles = async() => {
 
-  progressModal.value = true
-  downloadSuccess.value = false
+  startPromise()
 
   const getData = await naviapi.post('user-data/download',{
     itemList: fileCheckList.value,
@@ -276,7 +216,8 @@ const downloadFiles = async() => {
   },
   {
     onDownloadProgress: (progressEvent: AxiosProgressEvent) => {
-      downloadLoading.value = true
+      loadPromise()
+
       const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
       console.log(progressEvent, '@@@@@@@@')
       console.log(percent);
@@ -286,16 +227,11 @@ const downloadFiles = async() => {
     // 서버에서 에러처리를 따로해서 흠...
     // 성공한 데이터는 저장으로 처리하고싶은데... 아닌가??
     // 여기는 통신상태에서 완전히 실패했을때를 가정
-    downloadError.value = true
+    catchPromise()
     return data
   })
 
-  // 예상못한게 자꾸 생기네;
-  if(getData.status == 201 || getData.status == 200){
-    downloadError.value = false
-    downloadLoading.value = false
-    downloadSuccess.value = true
-  }
+  successPromise(getData.status)
 
   console.log(getData.data,' download', getData)
 
@@ -306,14 +242,14 @@ const downloadFiles = async() => {
   )=> {
     if(Array.isArray(files)) {
       files.forEach( file => {
-        downloadItems.value.push(file)
+        getDownloadItems(file)
         downloadBlob(file.file.data, file.fileName);
       })
     }
 
     //  자체적인 catch # 여러개 나오면 어떻할려고?? 상관없을듯 
     else if( 'error' in files) {
-      downloadItems.value.push({
+      getDownloadItems({
         fileName: 'download error',
         fileType: 'error/error'
       })
@@ -322,7 +258,8 @@ const downloadFiles = async() => {
 
     // 흠... 
     else{
-      downloadItems.value.push(files)
+      // downloadItems.value.push(files)
+      getDownloadItems(files)
       downloadBlob(files.file.data, files.fileName);
     }
   })
