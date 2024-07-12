@@ -65,6 +65,7 @@ const isPlay = ref(false)
 
 // 오디오 클릭
 const clickBox = (buffer: Buffer) => {
+  if(props.checkBoxHover) return
   dialog.value = true
   audioSrc.value = playAudio(buffer)
 }
