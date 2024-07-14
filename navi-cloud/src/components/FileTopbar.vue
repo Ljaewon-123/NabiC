@@ -11,7 +11,7 @@
 
   <v-row>
     <v-col>
-      <div class="d-flex justify-space-between">
+      <!-- <div class="d-flex justify-space-between"> -->
 
         <div class="d-flex gap-8 align-center">
           <v-checkbox
@@ -79,8 +79,20 @@
             </li>
           </template>
         </div>
+      </v-col>
+      <v-col >
+        <div class="d-flex gap-8 align-center">
 
-        <div class="d-flex gap-8">
+          <v-text-field 
+          v-model="search"
+          class="bar-search"
+          label="Search" variant="outlined"
+          prepend-inner-icon="mdi-magnify"
+          density="compact"
+          hide-details
+          clearable
+          ></v-text-field>
+
           <v-speed-dial
             location="bottom center"
             transition="fade-transition"
@@ -104,7 +116,7 @@
           
         </div>
 
-      </div>
+      <!-- </div> -->
     </v-col>
   </v-row>
 
@@ -188,7 +200,7 @@ const { trigger } = useReloadStore()
 // 현재 파일들 어디서나 가져올수있는건 괜찮음 
 const { files } = storeToRefs(uploadStore)
 const selectedFiles = useFileToolbarStore()
-const { allFileItemLen, fileCheckList, allFileItems } = storeToRefs(selectedFiles)
+const { allFileItemLen, fileCheckList, allFileItems, search } = storeToRefs(selectedFiles)
 const allCheck = ref<boolean>(false)
 const toggleBtn = ref()
 const newFolder = ref<boolean>(false)
@@ -320,4 +332,10 @@ watch(() => (fileCheckList.value), () => {
 .file-topbar .v-container{
   margin: 0 0;
 }
+
+.bar-search .v-input__control{
+  height: 40px;
+}
+
+
 </style>

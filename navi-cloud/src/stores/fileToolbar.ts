@@ -7,6 +7,9 @@ export const useFileToolbarStore = defineStore('fileToolbar', () => {
 
   const allFileItems = ref<BoxType[]>([])
 
+  const search = ref('')
+  const searchFilter = computed(() => !search.value ? '' : search.value)
+
   // allCheck기능에 사용하기위한 push 인위적이고 좋지않음... 흠;;
   function checkItemPush(item: BoxType){
     allFileItems.value.push(item)
@@ -22,5 +25,7 @@ export const useFileToolbarStore = defineStore('fileToolbar', () => {
     fileCheckList,
     allFileItemLen,
     allFileItems,
+    searchFilter,
+    search,
   }
 })

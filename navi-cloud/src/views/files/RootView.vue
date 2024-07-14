@@ -4,16 +4,15 @@
   <v-row class="mt-2">
     <v-col class="d-flex ga-3 flex-wrap">
       <!-- '/assets/images/svgs/folder-fill.svg' -->
-
       <file-box
-        v-for="folder in folders"
+        v-for="folder in filteredFolders"
         :key="folder.id"
         :item-folder="folder"
         is-folder
       ></file-box>
 
       <file-box
-        v-for="file in files"
+        v-for="file in filteredFiles"
         :key="file.id"
         :item="file"
         :item-type="file.fileType"
@@ -40,7 +39,7 @@ const { trigger, reloadReq } = useReloadStore()
 const { reload } = storeToRefs(reloadStore)
 const selectedFiles = useFileToolbarStore()
 const { clearCurrentItems } = useFileToolbarStore()
-const { allFileItemLen, allFileItems } = storeToRefs(selectedFiles)
+const { allFileItemLen, searchFilter } = storeToRefs(selectedFiles)
 
 const router = useRouter()
 const route = useRoute()
@@ -55,6 +54,14 @@ const pushRouter = (folderName: string) => {
 }
 const files = ref<UserFile[]>([])
 const folders = ref<Folder[]>([])
+
+const filteredFolders = computed(() => {
+  return folders.value.filter(folder => folder.folderName.includes(searchFilter.value));
+})
+
+const filteredFiles = computed(() => {
+  return files.value.filter(file => file.fileName.includes(searchFilter.value));
+})
 
 // const fileChecks = ref<any[]>([])
 // watch(fileChecks,() => {
