@@ -1,6 +1,6 @@
 <template>
 <keep-alive>
-  <Suspense>
+  <suspense>
     <component 
     :is="dynamic" 
     v-bind="props"
@@ -16,7 +16,7 @@
         <v-loading></v-loading>
       </v-card>
     </template>
-  </Suspense>
+  </suspense>
 </keep-alive>
 </template>
 

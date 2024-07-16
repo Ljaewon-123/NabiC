@@ -1,37 +1,51 @@
 <template>
-<v-container fluid class="h-100" >
+<v-container fluid class="h-100" 
+  :class="{ 'd-flex justify-center align-center' :downloadLoading }" 
+>
 
   <v-row class="mt-2">
-    <v-col class="d-flex ga-3 flex-wrap">
-      <!-- '/assets/images/svgs/folder-fill.svg' -->
-      <file-box
-        v-for="folder in filteredFolders"
-        :key="folder.id"
-        :item-folder="folder"
-        is-folder
-      ></file-box>
 
-      <file-box
-        v-for="file in filteredFiles"
-        :key="file.id"
-        :item="file"
-        :item-type="file.fileType"
-      ></file-box>
+    <stateful-renderer
+    :state-success="downloadSuccess"
+    :state-error="downloadError"
+    :state-loading="downloadLoading"
+    >
+      <v-col class="d-flex ga-3 flex-wrap">
+      
+        <file-box
+          v-for="folder in filteredFolders"
+          :key="folder.id"
+          :item-folder="folder"
+          is-folder
+        ></file-box>
 
-    </v-col>
+        <file-box
+          v-for="file in filteredFiles"
+          :key="file.id"
+          :item="file"
+          :item-type="file.fileType"
+        ></file-box>
+      </v-col>
+      <template #loading>
+        <v-col cols="12" class="h-100" >
+          <v-loading :size="100" :width="4" ></v-loading>
+        </v-col>
+      </template>
+    </stateful-renderer>
+
   </v-row>
 </v-container>
 </template>
 <!-- v-fade-transition -->
 <script lang="ts" setup>
 import { naviapi } from '@/boots/AxiosInstance';
-import type { Buffer } from 'buffer';
 import { ref, onMounted, computed, watchEffect, watch } from 'vue'
 import type { Folder, UserFile } from '@/types/FileBox';
 import { useRoute, useRouter } from 'vue-router';
 import { useReloadStore } from '@/stores/reload';
 import { storeToRefs } from 'pinia';
 import { useFileToolbarStore } from '@/stores/fileToolbar';
+import { useProgressStore } from '@/stores/progess';
 // import { pushRouter } from '@/utils';
 
 const reloadStore = useReloadStore()
@@ -41,17 +55,10 @@ const selectedFiles = useFileToolbarStore()
 const { clearCurrentItems } = useFileToolbarStore()
 const { allFileItemLen, searchFilter } = storeToRefs(selectedFiles)
 
-const router = useRouter()
-const route = useRoute()
-const pushRouter = (folderName: string) => {
-  router.push({ 
-    name: 'Path', 
-    params: { 
-      folderName: folderName, 
-      directory: folderName
-    } 
-  })
-}
+const downloadSuccess = ref(false)
+const downloadError = ref(false)
+const downloadLoading = ref(true)
+
 const files = ref<UserFile[]>([])
 const folders = ref<Folder[]>([])
 
@@ -69,7 +76,15 @@ const filteredFiles = computed(() => {
 // })
 
 const getUserData = async() => {
+  downloadSuccess.value = false
+  downloadError.value = false
+  downloadLoading.value = true
+
   const getUserData = await naviapi.get('user-data')
+
+  downloadLoading.value = false
+  downloadSuccess.value = true
+
   const data = getUserData.data
   clearCurrentItems()
   console.log(data)
@@ -84,10 +99,11 @@ const getUserData = async() => {
 
 watch( reload , async() => {
   await Promise.allSettled([
-    getUserData(),
+    getUserData().catch(() => downloadError.value = true),
     // Promise.reject('123').catch(console.log)
   ]).then(console.log)
 }, { immediate:true })
+
 // reloadReq([
 //   () => getUserData().catch(console.log),
 //   () => Promise.reject('123').catch(console.log)

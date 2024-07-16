@@ -1,6 +1,11 @@
 <!-- 스타일 맞추기 힘드네 ;;; -->
 <template>
-  <slot v-if="currentStatus == 'error'" name="error"></slot>
+  <slot v-if="currentStatus == 'error'" name="error">
+    <v-empty-state
+      headline="Fail API Fetch"
+      title="Please try again"
+    ></v-empty-state>
+  </slot>
   <slot v-else-if="currentStatus == 'success'" ></slot>
   <slot v-else-if="currentStatus == 'loading'" name="loading">
     <v-loading :size="100" :width="4"></v-loading>

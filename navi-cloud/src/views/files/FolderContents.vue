@@ -1,28 +1,36 @@
 <template>
-<v-container fluid class="h-100" >
+<v-container fluid class="h-100" 
+  :class="{ 'd-flex justify-center align-center' :downloadLoading }" 
+>
 
 <v-row class="mt-2">
-  <v-col class="d-flex ga-3 flex-wrap">
+  <stateful-renderer
+    :state-success="downloadSuccess"
+    :state-error="downloadError"
+    :state-loading="downloadLoading"
+    >
+      <v-col class="d-flex ga-3 flex-wrap">
+      
+        <file-box
+          v-for="folder in filteredFolders"
+          :key="folder.id"
+          :item-folder="folder"
+          is-folder
+        ></file-box>
 
-    <!-- {{ route.params.folderName }}
-    //
-    <br>
-    {{ result.data }} -->
-    <file-box
-      v-for="folder in filteredFolders"
-      :key="folder.id"
-      :item-folder="folder"
-      is-folder
-    ></file-box>
-
-    <file-box
-      v-for="file in filteredFiles"
-      :key="file.id"
-      :item="file"
-      :item-type="file.fileType"
-    ></file-box>
-
-  </v-col>
+        <file-box
+          v-for="file in filteredFiles"
+          :key="file.id"
+          :item="file"
+          :item-type="file.fileType"
+        ></file-box>
+      </v-col>
+      <template #loading>
+        <v-col cols="12" class="h-100" >
+          <v-loading :size="100" :width="4" ></v-loading>
+        </v-col>
+      </template>
+  </stateful-renderer>
 </v-row>
 </v-container>
 </template>
@@ -43,18 +51,11 @@ const { reload } = storeToRefs(reloadStore)
 const selectedFiles = useFileToolbarStore()
 const { clearCurrentItems } = useFileToolbarStore()
 const { allFileItemLen, allFileItems, searchFilter } = storeToRefs(selectedFiles)
-const router = useRouter()
 const route = useRoute()
-const pushRouter = (folderName: string) => {
-  router.push({ 
-    name: 'Path', 
-    params: { 
-      folderName: folderName, 
-      directory: `${route.params.directory}/${folderName}`
-    } 
-  })
 
-}
+const downloadSuccess = ref(false)
+const downloadError = ref(false)
+const downloadLoading = ref(true)
 
 const files = ref<UserFile[]>([])
 const folders = ref<Folder[]>([])
@@ -68,9 +69,17 @@ const filteredFiles = computed(() => {
 })
 
 const getUserData = async() => {
+  downloadSuccess.value = false
+  downloadError.value = false
+  downloadLoading.value = true
+
   const result = await naviapi.post('user-data', route.params)
   // { "folder": "haha", "depth": "1" }
-  console.table(result.data)
+  // console.table(result.data)
+  
+  downloadLoading.value = false
+  downloadSuccess.value = true
+
   allFileItems.value = []
   const data = result.data
   clearCurrentItems()
@@ -84,12 +93,12 @@ const getUserData = async() => {
 // getUserData()
 
 watch(() => route.params, () =>{
-  getUserData().catch(console.log)
+  getUserData().catch(() => downloadError.value = true)
 })
 
 watch( reload , async() => {
   await Promise.allSettled([
-    getUserData(),
+    getUserData().catch(() => downloadError.value = true),
     Promise.reject('123')
   ]).then(console.log)
 }, { immediate:true })
