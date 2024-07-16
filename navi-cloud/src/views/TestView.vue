@@ -1,18 +1,14 @@
 <template>
-<!-- <video controls width="250">
-  <source src="/media/cc0-videos/flower.webm" type="video/webm" />
-
-  <source src="/media/cc0-videos/flower.mp4" type="video/mp4" />
-
-  Download the
-  <a href="/media/cc0-videos/flower.webm">WEBM</a>
-  or
-  <a href="/media/cc0-videos/flower.mp4">MP4</a>
-  video.
-</video> -->
-<video preload="metadata"
-width="100px"
-src="/videos/시연동영상.mp4"></video>
-
+  <h1>DropZone</h1>
+  <DropZone />
+  <!-- <span class="file-info">File: {{ dropzoneFile.name }}</span> -->
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import DropZone from '@/components/DropZone.vue';
+
+const dropzoneFile = ref('')
+
+</script>
 

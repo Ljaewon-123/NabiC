@@ -84,8 +84,9 @@ class="w-100 file-topbar"
 height="140" elevation="0" >
   <file-topbar></file-topbar>
 </v-app-bar>
-  
-  <RouterView/>
+  <drop-zone class="w-100 h-100">
+    <RouterView/>
+  </drop-zone>
 </v-main>
 </template>
 
@@ -95,6 +96,7 @@ import FileTopbar from '@/components/FileTopbar.vue';
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import { useRouter } from 'vue-router';
 import FreeSpace from '@/components/FreeSpace.vue'
+import DropZone from '@/components/DropZone.vue';
 
 const router = useRouter()
 

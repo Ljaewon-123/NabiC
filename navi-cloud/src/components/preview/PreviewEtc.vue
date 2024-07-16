@@ -35,7 +35,7 @@ const props = defineProps({
 
 
 
-const clickBox = (buffer: Buffer) => {
+const clickBox = (buffer?: Buffer) => {
   // visibleRef.value = true
   // imgsRef.value = bufferToBase64(buffer)
 }

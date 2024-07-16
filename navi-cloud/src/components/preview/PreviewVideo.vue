@@ -61,7 +61,8 @@ const dialog = ref(false)
 const videoSrc = ref()
 const { height } = useDisplay()
 
-const clickBox = (buffer: Buffer) => {
+const clickBox = (buffer?: Buffer) => {
+  if(!buffer) return
   if(props.checkBoxHover) return
   dialog.value = true
   videoSrc.value = playVideo(buffer)

@@ -68,7 +68,6 @@ import { formatBytes } from '@/utils'
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useFileToolbarStore } from '@/stores/fileToolbar';
-import PreviewFile from '@/components/PreviewFile.vue'
 import PreviewContainer from './PreviewContainer.vue';
 
 interface CheckType{
