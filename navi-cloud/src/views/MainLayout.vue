@@ -40,6 +40,7 @@
             <v-list-item
               v-bind="props"
               :title="child.title"
+              class="text-decoration-line-through"
             ></v-list-item>
           </template>
 
@@ -60,6 +61,7 @@
           :title="child.title"
           :value="child.title"
           :color="'blue-darken-3'"
+          :class="{ 'text-decoration-line-through' : child.hold }"
         ></v-list-item>
         
       </template>
@@ -113,15 +115,15 @@ const links = [
           { title: 'Recent Open', url: '', icon: 'mdi-folder-open' }
         ] 
       },
-      { title:"Favorites" , url: ''}
+      { title:"Favorites" , url: '', hold: true }
     ]
   },
 
   { type: 'files',
     children: [
-      { title: 'Pictures', url: '',  },
-      { title: 'Videos', url: '',  },
-      { title: 'Document', url: '',  },
+      { title: 'Pictures', url: '',  hold: true },
+      { title: 'Videos', url: '',  hold: true },
+      { title: 'Document', url: '',  hold: true },
     ]
   }
 ]
