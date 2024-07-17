@@ -15,13 +15,38 @@
 
   <theme-switch ></theme-switch>
 
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
+  <v-menu
+    rounded
+  >
+    <template v-slot:activator="{ props }">
+      <v-btn
+        icon
+        v-bind="props"
+        size="small"
+      >
+        <v-avatar
+          icon="mdi-account"
+          size="small"
+          color="primary"
+        >
+        </v-avatar>
+      </v-btn>
+    </template>
+    <v-card>
+      <v-card-text>
+        <div class="mx-auto text-center">
+          <v-avatar icon="mdi-logout"></v-avatar>
+          <v-btn
+            variant="text"
+            rounded
+            @click="logout"
+          >
+            Log out
+          </v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-menu>
 
 </v-app-bar>
 
@@ -99,6 +124,7 @@ import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import { useRouter } from 'vue-router';
 import FreeSpace from '@/components/FreeSpace.vue'
 import DropZone from '@/components/DropZone.vue';
+import { naviapi } from '@/boots/AxiosInstance';
 
 const router = useRouter()
 
@@ -127,6 +153,12 @@ const links = [
     ]
   }
 ]
+
+const logout = async() => {
+  await naviapi.post('auth/logout',{})
+  router.push({ name: 'Login' })
+  localStorage.clear()
+}
 
 </script>
 

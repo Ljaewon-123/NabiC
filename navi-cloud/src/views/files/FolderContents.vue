@@ -30,6 +30,14 @@
           <v-loading :size="100" :width="4" ></v-loading>
         </v-col>
       </template>
+      <template #error>
+        <v-col cols="12" class="h-100" >
+          <v-empty-state
+            headline="Fail API Fetch"
+            title="Please try again"
+          ></v-empty-state>
+        </v-col>
+      </template>
   </stateful-renderer>
 </v-row>
 </v-container>

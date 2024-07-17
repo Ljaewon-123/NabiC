@@ -3,7 +3,7 @@
   <v-col cols="10" md="4" class="mx-auto">
     <v-card class="pa-4">
       <div class="text-center">
-        <h2 class="indigo--text">Vue login Page</h2>
+        <h2 class="indigo--text">Navi login Page</h2>
       </div>
       <v-form @submit.prevent="submitHandler" ref="form">
         <v-card-text>

@@ -23,10 +23,11 @@ export class AuthController {
     return this.authService.signin(dto)
   }
 
-  @Public()
+  // @Public()
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@GetCurrentUserId() userId: number): Promise<boolean> {
+    // console.log(userId,'@@@@@@@@@@@@@@@@@@@')
     return this.authService.logout(userId);
   }
 
