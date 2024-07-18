@@ -13,7 +13,7 @@
     <v-col>
       <!-- <div class="d-flex justify-space-between"> -->
 
-        <div class="d-flex gap-8 align-center">
+        <div class="d-flex gap-8 align-center" >
           <v-checkbox
             hide-details
             min-width="40"
@@ -72,12 +72,12 @@
           </div>
 
 
-          <template v-if="files">
+          <!-- <template v-if="files">
             <p>You have selected: <b>{{ `${files.length} ${files.length === 1 ? 'file' : 'files'}` }}</b></p>
             <li v-for="file of files" :key="file.name">
               {{ file.name }}
             </li>
-          </template>
+          </template> -->
         </div>
       </v-col>
       <v-col >
@@ -145,8 +145,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect, type Ref } from 'vue';
-import { useFileDialog } from '@vueuse/core'
-import { naviapi, upload } from '@/boots/AxiosInstance';
+import { naviapi } from '@/boots/AxiosInstance';
 import { useUpload } from '@/stores/upload';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
@@ -158,6 +157,7 @@ import type { AxiosProgressEvent } from 'axios';
 import CreateNewFolder from '@/components/CreateNewFolder.vue'
 import { useProgressStore } from '@/stores/progess';
 import DownloadModal from '@/components/DownloadModal.vue'
+import { useDisplay } from 'vuetify';
 
 interface DownloadData{
   id:number
@@ -168,14 +168,10 @@ interface DownloadData{
 interface DownloadError{
   error: 'download error'
 }
-interface DownloadErrorType{
-  id?: number
-  fileName: 'download error'
-  fileType: "error/error"
-}
+
 
 const route = useRoute()
-
+const { width } = useDisplay()
 const progressStore = useProgressStore()
 const { 
   startPromise,

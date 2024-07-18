@@ -108,7 +108,7 @@
 >
 <v-app-bar 
 class="w-100 file-topbar"
-height="140" elevation="0" >
+:height="heightWith" elevation="0" >
   <file-topbar></file-topbar>
 </v-app-bar>
   <drop-zone class="w-100 h-100">
@@ -118,18 +118,23 @@ height="140" elevation="0" >
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import FileTopbar from '@/components/FileTopbar.vue';
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import { useRouter } from 'vue-router';
 import FreeSpace from '@/components/FreeSpace.vue'
 import DropZone from '@/components/DropZone.vue';
 import { naviapi } from '@/boots/AxiosInstance';
+import { useDisplay } from 'vuetify';
 
 const router = useRouter()
 
 const drawer = ref()
-
+const { width } = useDisplay()
+const heightWith = computed(() => {
+  if(width.value < 525) return 200
+  return 140
+})
 
 const links = [
   { type: 'mngt' ,
