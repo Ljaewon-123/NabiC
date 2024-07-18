@@ -171,6 +171,27 @@ export class UserDataService {
       .execute();
   }
 
+  async userSpace(userId: number){
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+  
+    const hardSpace = user.hardSpace;
+  
+    // 사용자의 파일 크기 합계 가져오기
+    const totalFileSize = await this.filesRepository
+      .createQueryBuilder('files')
+      .select('SUM(files.size)', 'sum')
+      .where('files.userId = :userId', { userId })
+      .getRawOne();
+  
+    return {
+      hardSpace,
+      totalFileSize: totalFileSize.sum || 0,
+    }
+  }
+
   // this.filesRepository.delete({ 
   //   userId:userId, 
   //   directory: Like(

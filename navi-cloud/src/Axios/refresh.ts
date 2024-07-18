@@ -30,8 +30,12 @@ class AxiosRefresh {
   
         console.log('최종 반환', error)
         // 인증 최종 return 
-        localStorage.clear()
-        router.push({ name: 'Login' })
+
+        await instance.post('auth/logout',{})
+        // 이거 자체로는 로그아웃이 안됨
+        //  로그아웃 매서드를 실행시켜야함
+        // localStorage.clear()
+        // router.push({ name: 'Login' })
   
         return error
       }, { synchronous: true }

@@ -14,6 +14,11 @@ export class UserDataController {
   getFiles(@GetCurrentUserId() userId: number,){
     return this.userDataService.rootData(userId)
   }
+
+  @Get('space')
+  async getSpace(@GetCurrentUserId() userId: number){
+    return this.userDataService.userSpace(userId)
+  }
   
   @Post()
   getFolderData(

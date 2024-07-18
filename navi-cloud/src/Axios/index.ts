@@ -49,17 +49,16 @@ export class AxiosAPI {
   }
 
   protected async throwReq(){
-    try{
-      const response = await refresh.post('auth/refresh')
+    await refresh.post('auth/refresh')
+    .then((response) =>{
       const tokens = response.data
 
-      console.log(response.data)
+      console.log(response.data, ' throReq')
 
       setToken(tokens)
-    }
-    catch (e: any){
-      console.log(e)
-    }
+    })
+    .catch(console.log)
+    
   }
   
 

@@ -54,7 +54,6 @@ import { useFileToolbarStore } from '@/stores/fileToolbar';
 import { computed } from 'vue';
 
 const reloadStore = useReloadStore()
-const { trigger, reloadReq } = useReloadStore()
 const { reload } = storeToRefs(reloadStore)
 const selectedFiles = useFileToolbarStore()
 const { clearCurrentItems } = useFileToolbarStore()
