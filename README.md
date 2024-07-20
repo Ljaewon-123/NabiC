@@ -5,6 +5,8 @@
 # 주요기능
 
 
+## 용량이 커서 시간이 좀 걸립니다. !!!!!
+
 
 ![주요기능.gif](주요기능.gif)
 
@@ -42,6 +44,7 @@
 
 
 
+## 다크모드
 
 ![cloud-darkmode.gif](cloud-darkmode.gif)
 
@@ -49,7 +52,7 @@
 
 
 
-
+## 파일 액션 
 
 ![actions.gif](actions.gif)
 
