@@ -5,21 +5,33 @@ import vue from '@vitejs/plugin-vue'
 
 import electron from 'vite-plugin-electron/simple'
 import path from 'node:path';
+import vuetify from 'vite-plugin-vuetify'
 
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output:{
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return id
+              .toString()
+              .split("node_modules/")[1]
+              .split("/")[0]
+              .toString();
+          }
+
+        }
+      }
+    }
+  },
   plugins: [
     vue(),
-    // pages({
-    //   // dirs: 'src/views'
-    // }),
-    // Layouts({
-    //   layoutsDirs: 'src/mylayouts',
-    //   pagesDirs: 'src/pages',
-    //   defaultLayout: 'myDefault'
-    // }),
+    vuetify({
+      autoImport: true,
+    }),
     {
       name: 'electron',
       apply(config, { command }) {

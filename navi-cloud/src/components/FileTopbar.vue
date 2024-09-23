@@ -2,20 +2,21 @@
 
 <v-container fluid >
   <v-row>
-    <v-col>
+    <v-col class="pa-0 px-2">
       <span class="main-title">
-        ROOT
+        <file-router-path></file-router-path>
       </span>
     </v-col>
   </v-row>
 
   <v-row>
     <v-col>
-      <div class="d-flex justify-space-between">
+      <!-- <div class="d-flex justify-space-between"> -->
 
-        <div class="d-flex gap-8 align-center">
+        <div class="d-flex gap-8 align-center" >
           <v-checkbox
             hide-details
+            min-width="40"
             v-model="allCheck"
             @change="toggleAll"
           ></v-checkbox>  
@@ -71,15 +72,27 @@
           </div>
 
 
-          <template v-if="files">
+          <!-- <template v-if="files">
             <p>You have selected: <b>{{ `${files.length} ${files.length === 1 ? 'file' : 'files'}` }}</b></p>
             <li v-for="file of files" :key="file.name">
               {{ file.name }}
             </li>
-          </template>
+          </template> -->
         </div>
+      </v-col>
+      <v-col >
+        <div class="d-flex gap-8 align-center">
 
-        <div class="d-flex gap-8">
+          <v-text-field 
+          v-model="search"
+          class="bar-search"
+          label="Search" variant="outlined"
+          prepend-inner-icon="mdi-magnify"
+          density="compact"
+          hide-details
+          clearable
+          ></v-text-field>
+
           <v-speed-dial
             location="bottom center"
             transition="fade-transition"
@@ -103,65 +116,74 @@
           
         </div>
 
-      </div>
+      <!-- </div> -->
     </v-col>
   </v-row>
 
   <v-divider></v-divider>
 </v-container>
 
+<!-- 로딩화면, 에러화면, 완료시 화면 근데 이건 suspense가 아님  -->
+<outside-click-modal v-model="progressModal"
+  :x-position="{ right: 3 }"  :top="45"
+  :width="380"
+>
+  <download-modal></download-modal>
+</outside-click-modal>
+
 <v-dialog
   v-model="newFolder"
   max-width="400"
 >
-
-  <v-card
-    prepend-icon="mdi-folder-plus-outline"
-    title="Create Folder?"
-  >
-    <template #text>
-      <v-text-field
-        v-model="newFolderName"
-        hint="Enter your new folder name"
-        placeholder="Foler Name"
-        persistent-hint
-        density="comfortable"
-        :rules="requiredArr"
-      ></v-text-field>
-    </template>
-    <template #actions>
-      <v-spacer></v-spacer>
-
-      <v-btn 
-        color="primary" 
-        variant="tonal" 
-        @click="newFolder = false, createFolder()"
-        @keyup.enter="createFolder()"
-      >
-        Save
-      </v-btn>
-
-      <v-btn color="error" variant="outlined" @click="newFolder = false">
-        Cancel
-      </v-btn>
-    </template>
-  </v-card>
+  <create-new-folder
+    v-model="newFolder"
+    v-model:name="newFolderName"
+  ></create-new-folder>
 </v-dialog>
 
 </template>
 
 <script setup lang="ts">
 import { computed, ref, watch, watchEffect, type Ref } from 'vue';
-import { useFileDialog } from '@vueuse/core'
-import { naviapi, upload } from '@/boots/AxiosInstance';
+import { naviapi } from '@/boots/AxiosInstance';
 import { useUpload } from '@/stores/upload';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import { useFileToolbarStore } from '@/stores/fileToolbar';
 import { useReloadStore } from '@/stores/reload';
+import FileRouterPath from '@/components/FileRouterPath.vue'
+import type { Buffer } from 'buffer';
+import type { AxiosProgressEvent } from 'axios';
+import CreateNewFolder from '@/components/CreateNewFolder.vue'
+import { useProgressStore } from '@/stores/progess';
+import DownloadModal from '@/components/DownloadModal.vue'
+import { useDisplay } from 'vuetify';
+
+interface DownloadData{
+  id:number
+  fileName: string
+  file: { data: Buffer, type: "Buffer" }
+  fileType: string
+}
+interface DownloadError{
+  error: 'download error'
+}
+
 
 const route = useRoute()
-
+const { width } = useDisplay()
+const progressStore = useProgressStore()
+const { 
+  startPromise,
+  loadPromise,
+  successPromise,
+  getDownloadItems,
+  catchPromise,
+} = useProgressStore()
+const { 
+  progressModal,
+  downloadPercent,
+} = storeToRefs(progressStore)
 const { 
   onChange, 
   folderOnChange ,
@@ -174,27 +196,13 @@ const { trigger } = useReloadStore()
 // 현재 파일들 어디서나 가져올수있는건 괜찮음 
 const { files } = storeToRefs(uploadStore)
 const selectedFiles = useFileToolbarStore()
-const { allFileItemLen, fileCheckList, allFileItems } = storeToRefs(selectedFiles)
+const { allFileItemLen, fileCheckList, allFileItems, search } = storeToRefs(selectedFiles)
 const allCheck = ref<boolean>(false)
 const toggleBtn = ref()
 const newFolder = ref<boolean>(false)
 const newFolderName = ref<string>('')
 
-const createFolder = async() => {
-  if(!newFolderName.value) return '전역 얼럿 띄우는 기능 추가 '
-  const result = await naviapi.post('upload/create/folder', {
-    fileName: newFolderName.value,
-    depth: 0, // 임시로 0 
-    parent: route.params.folderName
-  });
 
-  console.log(result)
-}
-
-const requiredArr = [
-  (v:string) => !!v || 'Field is required',
-  (v: string) => /^[^\\\\/:*?"<>|]+$/.test(v) || "Don't use symbol",
-]
 
 const deleteFiles = async() => {
   await naviapi.delete('user-data', {
@@ -202,23 +210,93 @@ const deleteFiles = async() => {
       itemList: fileCheckList.value,
       directory: route.params.folderName ?? '/'
     }
-  })
+  }).then(() => trigger())
 
-  trigger()
 }
 
 const downloadFiles = async() => {
-  await naviapi.post('user-data/download',{
+
+  startPromise()
+
+  const getData = await naviapi.post('user-data/download',{
     itemList: fileCheckList.value,
     directory: route.params.folderName ?? '/'
+  },
+  {
+    onDownloadProgress: (progressEvent: AxiosProgressEvent) => {
+      loadPromise()
+
+      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
+      console.log(progressEvent, '@@@@@@@@')
+      console.log(percent);
+      downloadPercent.value = percent
+    }
+  }).catch((data) => {
+    // 서버에서 에러처리를 따로해서 흠...
+    // 성공한 데이터는 저장으로 처리하고싶은데... 아닌가??
+    // 여기는 통신상태에서 완전히 실패했을때를 가정
+    catchPromise()
+    return data
+  })
+
+  successPromise(getData.status)
+
+  console.log(getData.data,' download', getData)
+
+  const downloadData = getData.data
+
+  downloadData.forEach((
+    files: DownloadData | DownloadData[] | DownloadError
+  )=> {
+    if(Array.isArray(files)) {
+      files.forEach( file => {
+        getDownloadItems(file)
+        downloadBlob(file.file.data, file.fileName);
+      })
+    }
+
+    //  자체적인 catch # 여러개 나오면 어떻할려고?? 상관없을듯 
+    else if( 'error' in files) {
+      getDownloadItems({
+        fileName: 'download error',
+        fileType: 'error/error'
+      })
+      return 
+    }
+
+    // 흠... 
+    else{
+      // downloadItems.value.push(files)
+      getDownloadItems(files)
+      downloadBlob(files.file.data, files.fileName);
+    }
   })
 
   // trigger()
 }
 
+function downloadBlob(buffer:Buffer, filename: string) {
+  // Blob 생성
+  const blob = new Blob([new Uint8Array(buffer)]);
+  const url = URL.createObjectURL(blob);
+
+  // a 태그 생성
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename; 
+
+  document.body.appendChild(a);
+  a.click();
+
+  // a 태그와 URL 객체 정리
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 watch(newFolder, () => {
   newFolderName.value = ''
 })
+
 
 const hasSelectedFiles = computed(() => fileCheckList.value.length != 0 ? true : false )
 
@@ -250,4 +328,10 @@ watch(() => (fileCheckList.value), () => {
 .file-topbar .v-container{
   margin: 0 0;
 }
+
+.bar-search .v-input__control{
+  height: 40px;
+}
+
+
 </style>

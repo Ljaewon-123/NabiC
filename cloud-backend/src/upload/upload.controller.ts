@@ -39,11 +39,17 @@ export class UploadController {
   uploadArrayFile(
     @UploadedFiles() files: Array<Express.Multer.File>, 
     @GetCurrentUserId() userId: number,
-    @Body() body: {lastModified: string | string[], lastModifiedDate: string | string[]}
+    @Body() body: {
+      lastModified: string | string[], 
+      lastModifiedDate: string | string[],
+      currentPath: string
+    }
   ) {
 
     const lastModified = body.lastModified
     const lastModifiedDate = body.lastModifiedDate
+    const currentPath = body.currentPath
+    console.log(currentPath, '@@@@@@@@@@@@@@@@@@')
     const newFileArray = files.map( (file:Express.Multer.File, index: number ) => {
       return {
         userId: userId,
@@ -53,10 +59,12 @@ export class UploadController {
         file : file.buffer,
         fileType : file.mimetype,
         size: file.size,
+        directory: currentPath,
         folders: null
       }
     })
 
+    // console.log(body)
     // console.log(newFileArray, userId, files[0].destination, '목적지??')
     // console.log('body: ', body)
     this.uploadService.createFiles(userId, newFileArray)
@@ -78,12 +86,14 @@ export class UploadController {
     @Body() body: {
       lastModified: string | string[], 
       lastModifiedDate: string | string[],
+      currentPath: string
     },
   ) {
     // console.log('arrive',parent, typeof parent )
     
     const lastModified = body.lastModified
     const lastModifiedDate = body.lastModifiedDate
+    const currentPath = body.currentPath
     const newFileArray = pathFiles.map( (file:Express.Multer.File, index: number ) => {
       const nameArray = file.originalname.split('/')
       const fileName = nameArray.splice(-1, 1) // 마지막이 파일이름 
@@ -100,7 +110,8 @@ export class UploadController {
       })
     })
 
-    await this.uploadService.createPathFiles(newFileArray )
+    console.log(currentPath, '@@@@@@@@@@@@@@@@@')
+    await this.uploadService.createPathFiles(newFileArray , currentPath)
     
   }
 

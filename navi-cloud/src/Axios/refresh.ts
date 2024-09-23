@@ -30,8 +30,14 @@ class AxiosRefresh {
   
         console.log('최종 반환', error)
         // 인증 최종 return 
+
+        // 모든 종류의 인증이 만료된거라 이런형식은 못씀
+        // await instance.post('auth/logout',{})
+        
         localStorage.clear()
         router.push({ name: 'Login' })
+        // 새로고침
+        router.go(0)
   
         return error
       }, { synchronous: true }

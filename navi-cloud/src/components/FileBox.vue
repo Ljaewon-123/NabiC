@@ -65,11 +65,9 @@ import type { Buffer } from 'buffer';
 import type { PropType } from 'vue'
 import type { UserFile, Folder } from '@/types/FileBox';
 import { formatBytes } from '@/utils'
-import { useEasyLightbox } from 'vue-easy-lightbox';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useFileToolbarStore } from '@/stores/fileToolbar';
-import PreviewFile from '@/components/PreviewFile.vue'
 import PreviewContainer from './PreviewContainer.vue';
 
 interface CheckType{
@@ -100,7 +98,9 @@ const mouseover = ref(false)
 const star = ref(false)
 const checkBoxHover = ref(false)
 
-
+// watch(fileCheckList, () => {
+//   console.log(fileCheckList.value,'아니 대체왜??', selected.value)
+// })
 
 const selected = computed(() => {
   if(!fileCheckList.value) return mouseover.value
@@ -132,7 +132,11 @@ function typeOption(fileItem: {name?:string, type?: string}, folderItem: {name?:
 
 
 
-
+// {data: "",
+// id: 123,
+// isFolder: true,
+// name: "name",
+// type: undefined}
 // 좋지않음....
 checkItemPush(
   itemType(
@@ -141,14 +145,12 @@ checkItemPush(
       name: props.item?.fileName, 
       type: props.itemType,
       isFolder: props.isFolder,
-      data: ''
     }  , 
     { 
       id: props.itemFolder?.id,
       name: props.itemFolder?.folderName, 
       type: props.itemType,
       isFolder: props.isFolder,
-      data: ''
     }
   )
 )

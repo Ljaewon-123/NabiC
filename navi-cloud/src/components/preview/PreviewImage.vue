@@ -48,14 +48,16 @@ const {
 })
 
 
-const clickBox = (buffer: Buffer) => {
+const clickBox = (buffer?: Buffer) => {
+  if(!buffer) return
   if(props.checkBoxHover) return
   visibleRef.value = true
   imgsRef.value = bufferToBase64(buffer)
 }
 
 // 이제 이거는 항상 이미지임 
-const fileRender = (buffer: Buffer) => {
+const fileRender = (buffer?: Buffer) => {
+  if(!buffer) return
   // 이미지 , 문서 , 오디오만 보여주면됨 
   // const blob = new Blob([new Uint8Array(buffer)]);
   // const imageUrl = URL.createObjectURL(blob);

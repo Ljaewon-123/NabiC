@@ -1,15 +1,5 @@
 import { useAuthStore } from '@/stores/auth'
 import { createRouter, createWebHistory } from 'vue-router'
-// import { setupLayouts } from 'virtual:generated-layouts';
-// import generatedRoutes from 'virtual:generated-pages';
-
-// const routes = setupLayouts(generatedRoutes);
-
-// export const router = createRouter({
-//   history: createWebHistory(import.meta.env.BASE_URL),
-//   routes,
-//   strict: true,
-// });
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +14,12 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: () => import('@/views/Login.vue'),
+      beforeEnter: () => {
+        const { getAccessToken } = useAuthStore()
+        const token = getAccessToken()
+        if(token) return { name: 'Main' }
+
+      },
     },
     {
       path: '/signup',

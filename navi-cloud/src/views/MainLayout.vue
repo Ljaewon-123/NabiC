@@ -7,19 +7,46 @@
 
   <v-app-bar-title 
     style="cursor: pointer;" @click="router.push('/main')"
-  >MY CLOUD</v-app-bar-title>
+  >
+    MY CLOUD
+  </v-app-bar-title>
 
   <v-spacer></v-spacer>
 
   <theme-switch ></theme-switch>
 
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
-  <v-icon>mdi-account</v-icon>
+  <v-menu
+    rounded
+  >
+    <template v-slot:activator="{ props }">
+      <v-btn
+        icon
+        v-bind="props"
+        size="small"
+      >
+        <v-avatar
+          icon="mdi-account"
+          size="small"
+          color="primary"
+        >
+        </v-avatar>
+      </v-btn>
+    </template>
+    <v-card>
+      <v-card-text>
+        <div class="mx-auto text-center">
+          <v-avatar icon="mdi-logout"></v-avatar>
+          <v-btn
+            variant="text"
+            rounded
+            @click="logout"
+          >
+            Log out
+          </v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-menu>
 
 </v-app-bar>
 
@@ -38,6 +65,7 @@
             <v-list-item
               v-bind="props"
               :title="child.title"
+              class="text-decoration-line-through"
             ></v-list-item>
           </template>
 
@@ -58,6 +86,7 @@
           :title="child.title"
           :value="child.title"
           :color="'blue-darken-3'"
+          :class="{ 'text-decoration-line-through' : child.hold }"
         ></v-list-item>
         
       </template>
@@ -79,25 +108,33 @@
 >
 <v-app-bar 
 class="w-100 file-topbar"
-height="140" elevation="0" >
+:height="heightWith" elevation="0" >
   <file-topbar></file-topbar>
 </v-app-bar>
-  
-  <RouterView/>
+  <drop-zone class="w-100 h-100">
+    <RouterView/>
+  </drop-zone>
 </v-main>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import FileTopbar from '@/components/FileTopbar.vue';
 import ThemeSwitch from '@/components/ThemeSwitch.vue'
 import { useRouter } from 'vue-router';
 import FreeSpace from '@/components/FreeSpace.vue'
+import DropZone from '@/components/DropZone.vue';
+import { naviapi } from '@/boots/AxiosInstance';
+import { useDisplay } from 'vuetify';
 
 const router = useRouter()
 
 const drawer = ref()
-
+const { width } = useDisplay()
+const heightWith = computed(() => {
+  if(width.value < 525) return 200
+  return 140
+})
 
 const links = [
   { type: 'mngt' ,
@@ -109,18 +146,24 @@ const links = [
           { title: 'Recent Open', url: '', icon: 'mdi-folder-open' }
         ] 
       },
-      { title:"Favorites" , url: ''}
+      { title:"Favorites" , url: '', hold: true }
     ]
   },
 
   { type: 'files',
     children: [
-      { title: 'Pictures', url: '',  },
-      { title: 'Videos', url: '',  },
-      { title: 'Document', url: '',  },
+      { title: 'Pictures', url: '',  hold: true },
+      { title: 'Videos', url: '',  hold: true },
+      { title: 'Document', url: '',  hold: true },
     ]
   }
 ]
+
+const logout = async() => {
+  await naviapi.post('auth/logout',{})
+  router.push({ name: 'Login' })
+  localStorage.clear()
+}
 
 </script>
 

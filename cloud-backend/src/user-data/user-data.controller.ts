@@ -3,6 +3,7 @@ import { UserDataService } from './user-data.service';
 import { GetCurrentUserId } from 'src/common/decorators';
 import { CheckedFilesDto, FolderDataDto } from './dto';
 
+// 유저에 데이터를 가져오는?? 
 @Controller('user-data')
 export class UserDataController {
   constructor(
@@ -12,6 +13,11 @@ export class UserDataController {
   @Get()
   getFiles(@GetCurrentUserId() userId: number,){
     return this.userDataService.rootData(userId)
+  }
+
+  @Get('space')
+  async getSpace(@GetCurrentUserId() userId: number){
+    return this.userDataService.userSpace(userId)
   }
   
   @Post()

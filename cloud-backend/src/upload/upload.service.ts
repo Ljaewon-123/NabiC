@@ -32,7 +32,7 @@ export class UploadService {
 
     const validatorFiles = await this.validateFiles(files)
 
-    console.log(validatorFiles, 'null인데 왜저장?')
+    // console.log(validatorFiles, 'null인데 왜저장?')
     
     this.filesRepository.insert(validatorFiles)
 
@@ -76,17 +76,15 @@ export class UploadService {
   // 빈폴더만 선택하면 아무것도 안온다 
   // 실직적으로 폴더 전송은 내부 파일만 보내는 거라서
   // 그래서 폴더 생성이 따로있는건가?? 
-  async createPathFiles(files: ModifiedFile[] | Files[]){
+  async createPathFiles(files: ModifiedFile[] | Files[], currentPath: string){
 
     const folders = []
 
     files.forEach( file => {
       const directorySegments = file.directory.split('/');
-      // let currentParent = parent;
+      // console.log(directorySegments, directorySegments.slice(0, -1).join('/'))
       directorySegments.reduce( (acc: ModifiedFolder[], current: string, index:number, arr: string[] ) => {
         const existingFolder = acc.find(folder => folder.folderName == current );
-
-        // if(index != 0) currentParent = arr[index - 1];
 
         const folder = new Folders();
 
@@ -97,11 +95,13 @@ export class UploadService {
           }
         } 
         else {
+          const result = this.processPath(currentPath, directorySegments)
           // 기존 폴더가 없으면 새 폴더를 추가
+          console.log(result,'@@@@@@@@@@@@@@@@@@@@@@@@result' )
           folder.folderName = current
           folder.file = index == arr.length - 1 ? [file] : []
           folder.userId = file.userId
-          folder.directory = directorySegments.length == 1 ? '/' : directorySegments.slice(0, -1).join('/');
+          folder.directory = result
           acc.push(folder)
         }
 
@@ -113,7 +113,7 @@ export class UploadService {
 
     const parentFolder = folders[0];
     const newParentName = await this.validatorFolder(parentFolder)
-    console.log('newname', newParentName)
+    // console.log('newname', newParentName)
     // folders[0].folderName = newParentName.folderName
 
     const updatedChildFolders = await this.renameChildFolders(folders, parentFolder, newParentName.folderName);
@@ -121,14 +121,24 @@ export class UploadService {
     const renamedFiles = await this.renameFilesDirectory(files, parentFolder.folderName, newParentName.folderName);
     
     updatedChildFolders[0].folderName = newParentName.folderName
-    console.log(updatedChildFolders)
-    console.log('|||||||||')
-    console.log(renamedFiles)
+    // console.log(folders)
+    // console.log(updatedChildFolders,'update name')
+    // console.log('|||||||||')
+    // console.log(renamedFiles)
 
 
     // m : m은 save여야 join까지 가나보네...
     // const vaildate = await this.validateFiles(files) // 안해도될듯?? 다 쌔거라서 어차피 경로다 다다름 
+
+    const path = this.defaultPath(currentPath)
+    if(path !== ''){
+      files.forEach( file => {
+        // folderName/ 같은경우 방지  x
+        file.directory = path + '/' + file.directory
+      })
+    }
     
+    // console.log(files, folders)
     await this.filesRepository.save(files)
     await this.foldersRepository.save(folders)
 
@@ -148,9 +158,10 @@ export class UploadService {
       .createQueryBuilder()
       .where('folder_name = :name', { name: folderName })
       .andWhere('user_id_id = :userId', { userId: userId })
-      .andWhere('(directory = :directory )', { directory: directory ?? '/' })
+      .andWhere('(directory = :directory )', { directory: directory=='' ? '/' : directory })
       .getOne();
 
+    // console.log('not existing??????', existingFolder, directory)
     // 중복되지 않으면 그대로 반환
     if (!existingFolder) {
       return { folderName, userId };
@@ -166,7 +177,7 @@ export class UploadService {
         .createQueryBuilder()
         .where('folder_name = :name', { name: newFolderName })
         .andWhere('user_id_id = :userId', { userId: userId })
-        .andWhere('(directory = :directory )', { directory: directory ?? '/' })
+        .andWhere('(directory = :directory )', { directory: directory=='' ? '/' : directory })
         .getOne();
 
       if (!existingFolder) {
@@ -180,24 +191,6 @@ export class UploadService {
     // 새로운 폴더 이름을 반환
     return { folderName: newFolderName, userId };
   }
-
-  // async validatorFolder(
-  //   { folderName, userId, parent }: 
-  //   { 
-  //     folderName: string, 
-  //     userId: number ,
-  //     parent?: string
-  //   }
-  // ): Promise<Folders>{
-  //   const validatorFolder = await this.foldersRepository
-  //     .createQueryBuilder()
-  //     .where('folder_name = :name', { name: folderName })
-  //     .andWhere('user_id_id = :userId',{ userId: userId })
-  //     .andWhere('(parent = :parent )', { parent: parent ?? 'root' })
-  //     .getOne();
-
-  //   return validatorFolder
-  // }
 
   async validatorFolders(
     { folderNames, userId }: 
@@ -225,18 +218,19 @@ export class UploadService {
   }
 
   async createOneFolder(userId:number,  dto: FolderDto){
-    
+    console.log(dto, 'dto')
     const validate = await this.validatorFolder({
       folderName: dto.fileName, 
-      directory: dto.directory,
+      directory: dto.directory ?? '/',
       userId,
     })
 
     console.log(validate, 'validate')
-    if(validate) throw 'already match'
+    // 기존 중복은 저장하지 않는다 -> -copy(n)으로 저장한다로 바뀜 
+    // if(validate) throw 'already match'
 
     const folder = this.foldersRepository.create({
-      folderName: dto.fileName,
+      folderName: validate.folderName,
       userId: userId,
       directory: dto.directory,
     })
@@ -255,6 +249,11 @@ export class UploadService {
 
   async renameChildFolders(folders: ModifiedFolder[], parentFolder: ModifiedFolder, newFolderName: string) {
     for (const folder of folders) {
+      // console.log(folder)
+      // console.log('@@@@@@@@@@')
+      // console.log(parentFolder)
+      // console.log('new foldername?')
+      // console.log(newFolderName)
       if (folder.directory.startsWith(parentFolder.folderName)) {
         // 디렉토리의 첫 번째 세그먼트가 부모 폴더와 같은 경우 이름 변경
         folder.directory = folder.directory.replace(parentFolder.folderName, newFolderName);
@@ -274,5 +273,33 @@ export class UploadService {
 
     return files
   }
+
+  defaultPath(currentPath:string){
+    if(currentPath == '/') return ''
+
+    return currentPath 
+  }
+
+  processPath(currentPath :string, directorySegments :string[]) {
+    const path = this.defaultPath(currentPath);
+    let result = path + '/' + directorySegments.slice(0, -1).join('/');
+    
+    // result가 '/'인 경우
+    if (result === '/') {
+        return '/';
+    }
+
+     // 첫 글자가 '/'인 경우, 첫 글자 '/' 제거
+    if (result.startsWith('/')) {
+      result = result.slice(1);
+    }
+    
+    // 문자열 맨 뒤에 '/'가 있는 경우 제거
+    if (result.endsWith('/')) {
+        result = result.slice(0, -1);
+    }
+
+    return result;
+}
 
 }
