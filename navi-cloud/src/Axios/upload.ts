@@ -32,7 +32,8 @@ export class AxiosUpload extends AxiosAPI {
         const { config, response: { status }} = error
   
         if( status == 401 ){
-          await this.throwReq()
+          const res = await this.throwReq()
+          config.headers['Authorization'] = "Bearer " + res.accessToken
           return instance.request(config)
         }
   

@@ -35,8 +35,8 @@ export class AxiosAPI {
   
         if( status == 401 ){
           // alert(getAccessToken())
-          await this.throwReq()
-          // alert(getAccessToken())
+          const res = await this.throwReq()
+          config.headers['Authorization'] = "Bearer " + res.accessToken
           return instance.request(config)
 
         }
@@ -56,6 +56,8 @@ export class AxiosAPI {
       console.log(response.data)
 
       setToken(tokens)
+
+      return tokens
     }
     catch (e: any){
       console.log(e)
